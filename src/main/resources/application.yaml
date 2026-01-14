@@ -3,8 +3,10 @@ spring:
     name: library
 
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
+    url: jdbc:h2:mem:library;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
+    username: sa
+    password: password
 
 #  jpa:
 #    generate-ddl: false

@@ -1,8 +1,10 @@
---changeset id:1 author:RA
+--liquibase formatted sql
+
+--changeset RA:1
 CREATE TABLE books (
     id bigint PRIMARY KEY,
     book_name text
 );
---changeset id:2 author:RA
+--changeset RA:2
 INSERT INTO books (id, book_name) VALUES (1, 'Гарри Поттер');
 INSERT INTO books (id, book_name) VALUES (2, 'Задача трех тел');
