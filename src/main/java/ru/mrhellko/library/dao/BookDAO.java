@@ -16,7 +16,7 @@ public class BookDAO {
     private static final String GET_ALL_BOOK = "select * from books";
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private final RowMapper<Book> bookRowMapper = (resultSet, rowNum) -> {
+    private final RowMapper<Book> bookRowMapper = (resultSet, _) -> {
         final Book book = new Book();
         book.setId(resultSet.getLong("id"));
         book.setBookName(resultSet.getString("book_name"));
