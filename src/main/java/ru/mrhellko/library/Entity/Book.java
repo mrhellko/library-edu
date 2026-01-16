@@ -8,4 +8,5 @@ public class Book {
     private Long id;
 
     private String bookName;
+    private String author;
 }
