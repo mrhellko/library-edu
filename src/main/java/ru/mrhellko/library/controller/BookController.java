@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.mrhellko.library.Entity.Book;
 import ru.mrhellko.library.dao.BookDAO;
+import ru.mrhellko.library.dto.BookWithAverageRatingDTO;
 
 import java.util.List;
 
@@ -18,10 +19,10 @@ public class BookController {
     private BookDAO bookDAO;
 
     @GetMapping("/")
-    public List<Book> getAll() { return bookDAO.getAll();}
+    public List<BookWithAverageRatingDTO> getAll() { return bookDAO.getAll(); }
 
     @GetMapping("/{id}")
-    public Book getBookById(@PathVariable Long id) {
+    public BookWithAverageRatingDTO getBookById(@PathVariable Long id) {
         return bookDAO.getBookById(id);
     }
 }

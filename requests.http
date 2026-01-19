@@ -3,3 +3,9 @@ GET http://localhost:8080/books/2
 
 ### Получить список всех книг
 GET http://localhost:8080/books/
+
+### Получить отзыв по id книги (id указан после /book/)
+GET http://localhost:8080/reviews/book/1
+
+### Получить все отзыва от ревьювера (имя указано после /reviewer/)
+GET http://localhost:8080/reviews/reviewer/Sergei
