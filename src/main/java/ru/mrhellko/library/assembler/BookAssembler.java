@@ -36,7 +36,7 @@ public class BookAssembler {
         for (BookReviewByBookIdDTO bookReview : bookReviews) {
             sum += bookReview.getRating();
         }
-        if (bookReviews.size() == 0)
+        if (bookReviews.isEmpty())
             return null;
         else
             return (float) sum / bookReviews.size();
