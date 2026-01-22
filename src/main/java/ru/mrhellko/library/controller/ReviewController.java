@@ -18,14 +18,12 @@ public class ReviewController {
     private BookReviewDAO bookReviewDAO;
 
     @GetMapping("/book/{bookId}")
-    public List<BookReviewByBookIdDTO> getReviewByBookId(@PathVariable Long bookId)
-    {
+    public List<BookReviewByBookIdDTO> getReviewByBookId(@PathVariable Long bookId) {
         return bookReviewDAO.getReviewByBookId(bookId);
     }
 
     @GetMapping("/reviewer/{reviewerName}")
-    public List<BookReviewByReviewerNameDTO> getReviewByReviewerName(@PathVariable String reviewerName)
-    {
+    public List<BookReviewByReviewerNameDTO> getReviewByReviewerName(@PathVariable String reviewerName) {
         return bookReviewDAO.getReviewByReviewerName(reviewerName);
     }
 }

@@ -1,6 +1,7 @@
 package ru.mrhellko.library.dto;
 
 import lombok.Data;
+
 @Data
 public class BookReviewByReviewerNameDTO {
     private String text;

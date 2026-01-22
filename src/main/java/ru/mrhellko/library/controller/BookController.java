@@ -5,8 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.mrhellko.library.Entity.Book;
-import ru.mrhellko.library.dao.BookDAO;
+import ru.mrhellko.library.assembler.BookAssembler;
 import ru.mrhellko.library.dto.BookWithAverageRatingDTO;
 
 import java.util.List;
@@ -16,13 +15,15 @@ import java.util.List;
 public class BookController {
 
     @Autowired
-    private BookDAO bookDAO;
+    private BookAssembler bookAssembler;
 
     @GetMapping("/")
-    public List<BookWithAverageRatingDTO> getAll() { return bookDAO.getAll(); }
+    public List<BookWithAverageRatingDTO> getAll() {
+        return bookAssembler.getFullAllBooks();
+    }
 
     @GetMapping("/{id}")
     public BookWithAverageRatingDTO getBookById(@PathVariable Long id) {
-        return bookDAO.getBookById(id);
+        return bookAssembler.getFullBookWithAverageRatingDTO(id);
     }
 }

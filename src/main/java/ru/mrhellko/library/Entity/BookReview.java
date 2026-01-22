@@ -9,5 +9,5 @@ public class BookReview {
     private Byte rating;
 
     private String reviewerName;
-    private String text;
+    private String reviewText;
 }
