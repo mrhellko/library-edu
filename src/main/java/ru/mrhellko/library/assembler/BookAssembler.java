@@ -18,14 +18,14 @@ public class BookAssembler {
 
     public BookWithAverageRatingDTO getFullBookWithAverageRatingDTO(Long id) {
         BookWithAverageRatingDTO bookWithAverageRatingDTO = bookDAO.getBookById(id);
-        bookWithAverageRatingDTO.setAverageRating(this.getAverageRating(id));
+        bookWithAverageRatingDTO.setAverageRating(getAverageRating(id));
         return bookWithAverageRatingDTO;
     }
 
     public List<BookWithAverageRatingDTO> getFullAllBooks() {
         List<BookWithAverageRatingDTO> bookWithAverageRatingDTOs = bookDAO.getAll();
         for (BookWithAverageRatingDTO bookWithAverageRatingDTO : bookWithAverageRatingDTOs) {
-            bookWithAverageRatingDTO.setAverageRating(this.getAverageRating(bookWithAverageRatingDTO.getId()));
+            bookWithAverageRatingDTO.setAverageRating(getAverageRating(bookWithAverageRatingDTO.getId()));
         }
         return bookWithAverageRatingDTOs;
     }
@@ -36,9 +36,6 @@ public class BookAssembler {
         for (BookReviewByBookIdDTO bookReview : bookReviews) {
             sum += bookReview.getRating();
         }
-        if (bookReviews.isEmpty())
-            return null;
-        else
-            return (float) sum / bookReviews.size();
+        return bookReviews.isEmpty() ? null : (float) sum / bookReviews.size();
     }
 }
