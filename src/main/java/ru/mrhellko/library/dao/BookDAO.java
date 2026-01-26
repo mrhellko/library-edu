@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
-import ru.mrhellko.library.Entity.Book;
+import ru.mrhellko.library.dto.BookWithAverageRatingDTO;
 
 
 import java.util.List;
@@ -12,19 +12,19 @@ import java.util.List;
 @Service
 public class BookDAO {
 
-    private static final String GET_BOOK_BY_ID_SQL = "select * from books b where b.id = ?";
-    private static final String GET_ALL_BOOK = "select * from books";
+    private static final String GET_BOOK_BY_ID_SQL = "select b.id, b.book_name, b.author_name from books b where b.id = ?";
+    private static final String GET_ALL_BOOK = "select b.id, b.book_name, b.author_name from books b";
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private final RowMapper<Book> bookRowMapper = (resultSet, _) -> {
-        final Book book = new Book();
+    private final RowMapper<BookWithAverageRatingDTO> bookRowMapper = (resultSet, _) -> {
+        final BookWithAverageRatingDTO book = new BookWithAverageRatingDTO();
         book.setId(resultSet.getLong("id"));
         book.setBookName(resultSet.getString("book_name"));
         book.setAuthor(resultSet.getString("author_name"));
         return book;
     };
 
-    public Book getBookById(long id) {
+    public BookWithAverageRatingDTO getBookById(long id) {
         return jdbcTemplate.queryForObject(
                 GET_BOOK_BY_ID_SQL,
                 bookRowMapper,
@@ -32,7 +32,7 @@ public class BookDAO {
         );
     }
 
-    public List<Book> getAll(){
+    public List<BookWithAverageRatingDTO> getAll() {
         return jdbcTemplate.query(GET_ALL_BOOK, bookRowMapper);
     }
 }

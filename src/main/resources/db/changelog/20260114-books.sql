@@ -9,3 +9,4 @@ CREATE TABLE books (
 --changeset RA:2
 INSERT INTO books (id, book_name, author_name) VALUES (1, 'Гарри Поттер', 'Джоан Роулинг');
 INSERT INTO books (id, book_name, author_name) VALUES (2, 'Задача трех тел', 'Лю Цысинь');
+INSERT INTO books (id, book_name, author_name) VALUES (3, 'Игра престолов', 'Джордж Мартин');
