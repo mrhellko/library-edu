@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class BookReviewByReviewerNameDTO {
-    private String text;
+    private String reviewText;
     private Byte rating;
     private String bookName;
-    private String author;
+    private String authorName;
 }

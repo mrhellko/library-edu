@@ -9,3 +9,56 @@ GET http://localhost:8080/reviews/book/1
 
 ### Получить все отзыва от ревьювера (имя указано после /reviewer/)
 GET http://localhost:8080/reviews/reviewer/Sergei
+
+### Обновить книгу по id (id указан после /)
+PUT http://localhost:8080/books/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "bookName": "Битва королей",
+  "author": "Джордж Мартин"
+}
+
+### Создать новую книгу
+POST http://localhost:8080/books/
+Content-Type: application/json
+
+{
+  "id": 64,
+  "bookName": "Буря мечей",
+  "author": "Джордж Мартин"
+}
+
+### Удалить книгу по id (id указан после /)
+DELETE http://localhost:8080/books/2
+
+### Обновить отзыв по id (id указан после /)
+PUT http://localhost:8080/reviews/3
+Content-Type: application/json
+
+{
+  "id": 3,
+  "bookId": 1,
+  "rating": 5,
+  "reviewerName": "Sergei",
+  "reviewText": "Я перечитал книгу с ребенком. Неплохо."
+}
+
+### Создать новый отзыв
+POST http://localhost:8080/reviews/
+Content-Type: application/json
+
+{
+  "id": 5342,
+  "bookId": 3,
+  "rating": 10,
+  "reviewerName": "Irina",
+  "reviewText": "Очень залипательно, я обожаю этот мир!"
+}
+
+### Удалить книгу по id (id указан после /)
+DELETE http://localhost:8080/reviews/3
+
+### Получить список всех книг от автора
+GET http://localhost:8080/books/by-author/row
