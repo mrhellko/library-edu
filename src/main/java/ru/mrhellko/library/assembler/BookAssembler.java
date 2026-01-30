@@ -2,14 +2,13 @@ package ru.mrhellko.library.assembler;
 
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.mrhellko.library.Entity.Book;
 import ru.mrhellko.library.Entity.BookReview;
 import ru.mrhellko.library.dao.BookDAO;
 import ru.mrhellko.library.dao.BookReviewDAO;
 import ru.mrhellko.library.dto.BookWithAverageRatingDTO;
+import ru.mrhellko.library.exception.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,28 +20,27 @@ public class BookAssembler {
     @Autowired
     private BookReviewDAO bookReviewDAO;
 
-    public ResponseEntity<BookWithAverageRatingDTO> getFullBookWithAverageRatingDTO(Long id) {
+    public BookWithAverageRatingDTO getFullBookWithAverageRatingDTO(Long id) {
         Book book = bookDAO.getBookById(id);
         if (book != null) {
             BookWithAverageRatingDTO bookWithAverageRatingDTO = new BookWithAverageRatingDTO(book);
             bookWithAverageRatingDTO.setAverageRating(getAverageRating(id));
-            return new ResponseEntity<>(bookWithAverageRatingDTO, HttpStatus.OK);
+            return bookWithAverageRatingDTO;
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return null;
         }
     }
 
-    public ResponseEntity<List<BookWithAverageRatingDTO>> getFullAllBooks() {
+    public List<BookWithAverageRatingDTO> getFullAllBooks() {
         List<Book> books = bookDAO.getAll();
         if (!books.isEmpty()) {
-            List<BookWithAverageRatingDTO> bookWithAverageRatingDTOs = fillListOfBookWithAverageRatingDTO(books);
-            return new ResponseEntity<>(bookWithAverageRatingDTOs, HttpStatus.OK);
+            return fillListOfBookWithAverageRatingDTO(books);
         } else {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return null;
         }
     }
 
-    public ResponseEntity<Book> updateBook(Book book, Long id) {
+    public Book updateBook(Book book, Long id) {
         Book updatedBook = bookDAO.getBookById(id);
         if (updatedBook != null) {
             updatedBook.setId(id);
@@ -50,42 +48,29 @@ public class BookAssembler {
             updatedBook.setAuthor(book.getAuthor());
 
             bookDAO.updateBook(updatedBook);
-
-            return new ResponseEntity<>(updatedBook, HttpStatus.OK);
+            return updatedBook;
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return null;
         }
     }
 
-    public ResponseEntity<Book> saveBook(Book book) {
-        try {
-            Book savedBook = bookDAO.saveBook(book);
-            return new ResponseEntity<>(savedBook, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    public Book saveBook(Book book) throws Exception {
+        return bookDAO.saveBook(book);
+    }
+
+    public void deleteBook(Long id) throws NotFoundException, Exception {
+        int resultBook = bookDAO.deleteBookById(id);
+        if (resultBook == 0) {
+            throw new NotFoundException(id);
         }
     }
 
-    public ResponseEntity<Void> deleteBook(Long id) {
-        try {
-            bookReviewDAO.deleteBookReviewByBookId(id);
-            int resultBook = bookDAO.deleteBookById(id);
-            if (resultBook == 0) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public ResponseEntity<List<BookWithAverageRatingDTO>> getBooksByAuthorName(String authorName) {
+    public List<BookWithAverageRatingDTO> getBooksByAuthorName(String authorName) {
         List<Book> books = bookDAO.getBooksByAuthorName(authorName);
         if (!books.isEmpty()) {
-            List<BookWithAverageRatingDTO> bookWithAverageRatingDTOs = fillListOfBookWithAverageRatingDTO(books);
-            return new ResponseEntity<>(bookWithAverageRatingDTOs, HttpStatus.OK);
+            return fillListOfBookWithAverageRatingDTO(books);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return null;
         }
     }
 

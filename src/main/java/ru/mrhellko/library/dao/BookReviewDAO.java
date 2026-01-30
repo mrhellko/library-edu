@@ -16,10 +16,9 @@ public class BookReviewDAO {
     private static final String GET_REVIEW_BY_ID_BOOK_SQL = "select r.id, r.book_id, r.rating, r.reviewer_name, r.review_text from book_reviews r where r.book_id = ?";
     private static final String GET_REVIEW_BY_REVIEWER_NAME_SQL = "select r.review_text, r.rating, b.book_name, b.author_name from book_reviews r inner join books b on b.id = r.book_id where r.reviewer_name = ?";
     private static final String UPDATE_REVIEW_BY_ID_SQL = "update book_reviews set book_id = ?, rating = ?, reviewer_name = ?, review_text = ? where id = ?";
-    private static final String SAVE_REVIEW_SQL = "insert into book_reviews (id, book_id, rating, reviewer_name, review_text) values (nextval('book_reviews_seq'), ?, ?, ?, ?)";
-    private static final String GET_LAST_REVIEW_SQL = "select r.id, r.book_id, r.rating, r.reviewer_name, r.review_text from book_reviews r order by id desc limit 1";
+    private static final String SAVE_REVIEW_SQL = "insert into book_reviews (id, book_id, rating, reviewer_name, review_text) values (?, ?, ?, ?, ?)";
     private static final String DELETE_REVIEW_BY_ID_SQL = "delete from book_reviews where id = ?";
-    private static final String DELETE_REVIEW_BY_BOOK_ID_SQL = "delete from book_reviews where book_id = ?";
+    private static final String GET_NEXT_SEQUENCE_ID_SQL = "select nextval('book_reviews_seq') as id";
     @Autowired
     private JdbcTemplate jdbcTemplate;
     private final RowMapper<BookReview> bookReviewRowMapper = (resultSet, _) -> {
@@ -39,6 +38,7 @@ public class BookReviewDAO {
         bookReviewByReviewerNameDTO.setAuthorName(resultSet.getString("author_name"));
         return bookReviewByReviewerNameDTO;
     };
+    private final RowMapper<Long> idRowMapper = (resultSet, _) -> (Long) resultSet.getLong("id");
 
     public BookReview getReviewById(long id) {
         try {
@@ -65,20 +65,17 @@ public class BookReviewDAO {
         );
     }
 
-    public int updateBookReview(BookReview bookReview) {
-        return jdbcTemplate.update(UPDATE_REVIEW_BY_ID_SQL, new Object[]{bookReview.getBookId(), bookReview.getRating(), bookReview.getReviewerName(), bookReview.getReviewText(), bookReview.getId()});
+    public void updateBookReview(BookReview bookReview) {
+        jdbcTemplate.update(UPDATE_REVIEW_BY_ID_SQL, bookReview.getBookId(), bookReview.getRating(), bookReview.getReviewerName(), bookReview.getReviewText(), bookReview.getId());
     }
 
-    public BookReview saveBookReview(BookReview bookReview) {
-        jdbcTemplate.update(SAVE_REVIEW_SQL, new Object[]{bookReview.getBookId(), bookReview.getRating(), bookReview.getReviewerName(), bookReview.getReviewText()});
-        return jdbcTemplate.queryForObject(GET_LAST_REVIEW_SQL, bookReviewRowMapper);
+    public BookReview saveBookReview(BookReview bookReview) throws Exception {
+        bookReview.setId(jdbcTemplate.queryForObject(GET_NEXT_SEQUENCE_ID_SQL, idRowMapper));
+        jdbcTemplate.update(SAVE_REVIEW_SQL, bookReview.getId(), bookReview.getBookId(), bookReview.getRating(), bookReview.getReviewerName(), bookReview.getReviewText());
+        return bookReview;
     }
 
-    public int deleteBookReviewById(Long id) {
+    public int deleteBookReviewById(Long id) throws Exception {
         return jdbcTemplate.update(DELETE_REVIEW_BY_ID_SQL, id);
-    }
-
-    public int deleteBookReviewByBookId(Long bookId) {
-        return jdbcTemplate.update(DELETE_REVIEW_BY_BOOK_ID_SQL, bookId);
     }
 }

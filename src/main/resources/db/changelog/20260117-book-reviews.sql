@@ -11,8 +11,10 @@ CREATE TABLE book_reviews
     review_text   character varying,
 
     constraint BOOK_REVIEWS_BOOKS_ID_fk
-        foreign key (book_id) references books
+        foreign key (book_id) references books on delete cascade
 );
+--changeset EA:4
+CREATE INDEX idx_book_reviews_book_id ON book_reviews (book_id);
 
 --changeset EA:2
 INSERT INTO book_reviews (id, book_id, rating, reviewer_name, review_text)

@@ -1,13 +1,12 @@
 package ru.mrhellko.library.assembler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.mrhellko.library.Entity.BookReview;
 import ru.mrhellko.library.dao.BookReviewDAO;
 import ru.mrhellko.library.dto.BookReviewByBookIdDTO;
 import ru.mrhellko.library.dto.BookReviewByReviewerNameDTO;
+import ru.mrhellko.library.exception.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,7 @@ public class BookReviewAssembler {
     @Autowired
     BookReviewDAO bookReviewDAO;
 
-    public ResponseEntity<List<BookReviewByBookIdDTO>> getReviewByBookId(Long bookId) {
+    public List<BookReviewByBookIdDTO> getReviewByBookId(Long bookId) {
         List<BookReview> bookReviews = bookReviewDAO.getReviewByBookId(bookId);
         if (!bookReviews.isEmpty()) {
             List<BookReviewByBookIdDTO> bookReviewByBookIdDTOS = new ArrayList<>();
@@ -25,22 +24,17 @@ public class BookReviewAssembler {
                 BookReviewByBookIdDTO bookReviewByBookIdDTO = new BookReviewByBookIdDTO(bookReview);
                 bookReviewByBookIdDTOS.add(bookReviewByBookIdDTO);
             }
-            return new ResponseEntity<>(bookReviewByBookIdDTOS, HttpStatus.OK);
+            return bookReviewByBookIdDTOS;
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return null;
         }
     }
 
-    public ResponseEntity<List<BookReviewByReviewerNameDTO>> getReviewByReviewerName(String reviewerName) {
-        List<BookReviewByReviewerNameDTO> bookReviewByReviewerNameDTOS = bookReviewDAO.getReviewByReviewerName(reviewerName);
-        if (!bookReviewByReviewerNameDTOS.isEmpty()) {
-            return new ResponseEntity<>(bookReviewByReviewerNameDTOS, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public List<BookReviewByReviewerNameDTO> getReviewByReviewerName(String reviewerName) {
+        return bookReviewDAO.getReviewByReviewerName(reviewerName);
     }
 
-    public ResponseEntity<BookReview> updateBookReview(BookReview bookReview, Long id) {
+    public BookReview updateBookReview(BookReview bookReview, Long id) {
         BookReview updatedBookReview = bookReviewDAO.getReviewById(id);
         if (updatedBookReview != null) {
             updatedBookReview.setId(id);
@@ -51,30 +45,20 @@ public class BookReviewAssembler {
 
             bookReviewDAO.updateBookReview(updatedBookReview);
 
-            return new ResponseEntity<>(updatedBookReview, HttpStatus.OK);
+            return updatedBookReview;
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return null;
         }
     }
 
-    public ResponseEntity<BookReview> saveBookReview(BookReview bookReview) {
-        try {
-            BookReview savedBookReview = bookReviewDAO.saveBookReview(bookReview);
-            return new ResponseEntity<>(savedBookReview, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public BookReview saveBookReview(BookReview bookReview) throws Exception {
+        return bookReviewDAO.saveBookReview(bookReview);
     }
 
-    public ResponseEntity<Void> deleteBookReviewById(Long id) {
-        try {
-            int result = bookReviewDAO.deleteBookReviewById(id);
-            if (result == 0) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public void deleteBookReviewById(Long id) throws NotFoundException, Exception {
+        int result = bookReviewDAO.deleteBookReviewById(id);
+        if (result == 0) {
+            throw new NotFoundException(id);
         }
     }
 }

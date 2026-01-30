@@ -16,10 +16,10 @@ public class BookDAO {
     private static final String GET_BOOK_BY_ID_SQL = "select b.id, b.book_name, b.author_name from books b where b.id = ?";
     private static final String GET_ALL_BOOK_SQL = "select b.id, b.book_name, b.author_name from books b";
     private static final String UPDATE_BOOK_BY_ID_SQL = "update books set book_name = ?, author_name = ? where id = ?";
-    private static final String SAVE_BOOK_SQL = "insert into books (id, book_name, author_name) values (nextval('books_seq'), ?, ?)";
-    private static final String GET_LAST_BOOK_SQL = "select b.id, b.book_name, b.author_name from books b order by id desc limit 1";
+    private static final String SAVE_BOOK_SQL = "insert into books (id, book_name, author_name) values (?, ?, ?)";
     private static final String DELETE_BOOK_BY_ID_SQL = "delete from books where id = ?";
     private static final String GET_BOOKS_BY_AUTHOR_NAME = "select b.id, b.book_name, b.author_name from books b where b.author_name ilike '%' || ? || '%'";
+    private static final String GET_NEXT_SEQUENCE_ID_SQL = "select nextval('books_seq') as id";
     @Autowired
     private JdbcTemplate jdbcTemplate;
     private final RowMapper<Book> bookRowMapper = (resultSet, _) -> {
@@ -29,6 +29,7 @@ public class BookDAO {
         book.setAuthor(resultSet.getString("author_name"));
         return book;
     };
+    private final RowMapper<Long> idRowMapper = (resultSet, _) -> (Long) resultSet.getLong("id");
 
     public Book getBookById(long id) {
         try {
@@ -46,16 +47,17 @@ public class BookDAO {
         return jdbcTemplate.query(GET_ALL_BOOK_SQL, bookRowMapper);
     }
 
-    public int updateBook(Book book) {
-        return jdbcTemplate.update(UPDATE_BOOK_BY_ID_SQL, new Object[]{book.getBookName(), book.getAuthor(), book.getId()});
+    public void updateBook(Book book) {
+        jdbcTemplate.update(UPDATE_BOOK_BY_ID_SQL, book.getBookName(), book.getAuthor(), book.getId());
     }
 
-    public Book saveBook(Book book) {
-        jdbcTemplate.update(SAVE_BOOK_SQL, new Object[]{book.getBookName(), book.getAuthor()});
-        return jdbcTemplate.queryForObject(GET_LAST_BOOK_SQL, bookRowMapper);
+    public Book saveBook(Book book) throws Exception {
+        book.setId(jdbcTemplate.queryForObject(GET_NEXT_SEQUENCE_ID_SQL, idRowMapper));
+        jdbcTemplate.update(SAVE_BOOK_SQL, book.getId(), book.getBookName(), book.getAuthor());
+        return book;
     }
 
-    public int deleteBookById(Long id) {
+    public int deleteBookById(Long id) throws Exception {
         return jdbcTemplate.update(DELETE_BOOK_BY_ID_SQL, id);
     }
 
