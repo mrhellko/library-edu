@@ -1,6 +1,7 @@
 package ru.mrhellko.library.dto;
 
 import lombok.Data;
+import ru.mrhellko.library.Entity.Book;
 
 @Data
 public class BookWithAverageRatingDTO {
@@ -9,4 +10,10 @@ public class BookWithAverageRatingDTO {
     private String bookName;
     private String author;
     private Float averageRating;
+
+    public BookWithAverageRatingDTO(Book book) {
+        id = book.getId();
+        bookName = book.getBookName();
+        author = book.getAuthor();
+    }
 }
