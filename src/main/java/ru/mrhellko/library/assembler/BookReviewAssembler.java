@@ -18,16 +18,12 @@ public class BookReviewAssembler {
 
     public List<BookReviewByBookIdDTO> getReviewByBookId(Long bookId) {
         List<BookReview> bookReviews = bookReviewDAO.getReviewByBookId(bookId);
-        if (!bookReviews.isEmpty()) {
-            List<BookReviewByBookIdDTO> bookReviewByBookIdDTOS = new ArrayList<>();
-            for (BookReview bookReview : bookReviews) {
-                BookReviewByBookIdDTO bookReviewByBookIdDTO = new BookReviewByBookIdDTO(bookReview);
-                bookReviewByBookIdDTOS.add(bookReviewByBookIdDTO);
-            }
-            return bookReviewByBookIdDTOS;
-        } else {
-            return null;
+        List<BookReviewByBookIdDTO> bookReviewByBookIdDTOS = new ArrayList<>();
+        for (BookReview bookReview : bookReviews) {
+            BookReviewByBookIdDTO bookReviewByBookIdDTO = new BookReviewByBookIdDTO(bookReview);
+            bookReviewByBookIdDTOS.add(bookReviewByBookIdDTO);
         }
+        return bookReviewByBookIdDTOS;
     }
 
     public List<BookReviewByReviewerNameDTO> getReviewByReviewerName(String reviewerName) {
@@ -55,7 +51,7 @@ public class BookReviewAssembler {
         return bookReviewDAO.saveBookReview(bookReview);
     }
 
-    public void deleteBookReviewById(Long id) throws NotFoundException, Exception {
+    public void deleteBookReviewById(Long id) throws Exception {
         int result = bookReviewDAO.deleteBookReviewById(id);
         if (result == 0) {
             throw new NotFoundException(id);

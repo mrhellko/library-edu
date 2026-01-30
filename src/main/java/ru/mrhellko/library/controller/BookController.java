@@ -21,7 +21,7 @@ public class BookController {
     @GetMapping("/")
     public ResponseEntity<List<BookWithAverageRatingDTO>> getAll() {
         List<BookWithAverageRatingDTO> bookWithAverageRatingDTOs = bookAssembler.getFullAllBooks();
-        if (bookWithAverageRatingDTOs != null) {
+        if (!bookWithAverageRatingDTOs.isEmpty()) {
             return new ResponseEntity<>(bookWithAverageRatingDTOs, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -70,10 +70,10 @@ public class BookController {
         }
     }
 
-    @GetMapping("/by-author")
+    @GetMapping("")
     public ResponseEntity<List<BookWithAverageRatingDTO>> getBooksByAuthorName(@RequestParam(value = "authorName") String authorName) {
         List<BookWithAverageRatingDTO> bookWithAverageRatingDTOs = bookAssembler.getBooksByAuthorName(authorName);
-        if (bookWithAverageRatingDTOs != null) {
+        if (!bookWithAverageRatingDTOs.isEmpty()) {
             return new ResponseEntity<>(bookWithAverageRatingDTOs, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

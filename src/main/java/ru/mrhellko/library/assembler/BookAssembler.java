@@ -33,11 +33,7 @@ public class BookAssembler {
 
     public List<BookWithAverageRatingDTO> getFullAllBooks() {
         List<Book> books = bookDAO.getAll();
-        if (!books.isEmpty()) {
-            return fillListOfBookWithAverageRatingDTO(books);
-        } else {
-            return null;
-        }
+        return fillListOfBookWithAverageRatingDTO(books);
     }
 
     public Book updateBook(Book book, Long id) {
@@ -58,7 +54,7 @@ public class BookAssembler {
         return bookDAO.saveBook(book);
     }
 
-    public void deleteBook(Long id) throws NotFoundException, Exception {
+    public void deleteBook(Long id) throws Exception {
         int resultBook = bookDAO.deleteBookById(id);
         if (resultBook == 0) {
             throw new NotFoundException(id);
@@ -67,11 +63,7 @@ public class BookAssembler {
 
     public List<BookWithAverageRatingDTO> getBooksByAuthorName(String authorName) {
         List<Book> books = bookDAO.getBooksByAuthorName(authorName);
-        if (!books.isEmpty()) {
-            return fillListOfBookWithAverageRatingDTO(books);
-        } else {
-            return null;
-        }
+        return fillListOfBookWithAverageRatingDTO(books);
     }
 
     private @NonNull List<BookWithAverageRatingDTO> fillListOfBookWithAverageRatingDTO(List<Book> books) {

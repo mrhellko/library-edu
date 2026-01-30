@@ -8,7 +8,7 @@ GET http://localhost:8080/books/
 GET http://localhost:8080/reviews/book/1
 
 ### Получить все отзыва от ревьювера (имя указано после ?reviewerName=)
-GET http://localhost:8080/reviews/reviewer?reviewerName=Sergei
+GET http://localhost:8080/reviews?reviewerName=Sergei
 
 ### Обновить книгу по id (id указан после /)
 PUT http://localhost:8080/books/1
@@ -61,4 +61,4 @@ Content-Type: application/json
 DELETE http://localhost:8080/reviews/3
 
 ### Получить список всех книг от автора (автор указан после ?authorName=)
-GET http://localhost:8080/books/by-author?authorName=row
+GET http://localhost:8080/books?authorName=row

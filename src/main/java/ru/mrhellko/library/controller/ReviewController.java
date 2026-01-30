@@ -21,14 +21,14 @@ public class ReviewController {
     @GetMapping("/book/{bookId}")
     public ResponseEntity<List<BookReviewByBookIdDTO>> getReviewByBookId(@PathVariable Long bookId) {
         List<BookReviewByBookIdDTO> bookReviewByBookIdDTOs = bookReviewAssembler.getReviewByBookId(bookId);
-        if (bookReviewByBookIdDTOs != null) {
+        if (!bookReviewByBookIdDTOs.isEmpty()) {
             return new ResponseEntity<>(bookReviewByBookIdDTOs, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 
-    @GetMapping("/reviewer")
+    @GetMapping("")
     public ResponseEntity<List<BookReviewByReviewerNameDTO>> getReviewByReviewerName(@RequestParam(value = "reviewerName") String reviewerName) {
         List<BookReviewByReviewerNameDTO> bookReviewByReviewerNameDTOs = bookReviewAssembler.getReviewByReviewerName(reviewerName);
         if (!bookReviewByReviewerNameDTOs.isEmpty()) {
