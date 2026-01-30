@@ -19,8 +19,8 @@ public class BookDAOTest {
      */
     @Test
     void notFoundTest() {
-        List<Book> notExistenceAuthor = bookDAO.getBooksByAuthorName("not existence author");
-        assertThat(notExistenceAuthor).isEmpty();
+        List<Book> books = bookDAO.getBooksByAuthorName("not existence author");
+        assertThat(books).isEmpty();
     }
 
     /**
@@ -28,8 +28,8 @@ public class BookDAOTest {
      */
     @Test
     void foundManyTest() {
-        List<Book> notExistenceAuthor = bookDAO.getBooksByAuthorName("И");
-        assertThat(notExistenceAuthor)
+        List<Book> books = bookDAO.getBooksByAuthorName("И");
+        assertThat(books)
                 .map(Book::getAuthor)
                 .contains("Лю Цысинь")
                 .contains("Джордж Мартин");
@@ -40,8 +40,8 @@ public class BookDAOTest {
      */
     @Test
     void foundOneTest() {
-        List<Book> notExistenceAuthor = bookDAO.getBooksByAuthorName("Joan Rowling");
-        assertThat(notExistenceAuthor)
+        List<Book> books = bookDAO.getBooksByAuthorName("Joan Rowling");
+        assertThat(books)
                 .map(Book::getAuthor)
                 .allMatch(author -> author.equals("Joan Rowling"));
     }
