@@ -70,7 +70,7 @@ public class BookController {
         }
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<List<BookWithAverageRatingDTO>> getBooksByAuthorName(@RequestParam(value = "authorName") String authorName) {
         List<BookWithAverageRatingDTO> bookWithAverageRatingDTOs = bookAssembler.getBooksByAuthorName(authorName);
         if (!bookWithAverageRatingDTOs.isEmpty()) {

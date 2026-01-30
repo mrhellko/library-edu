@@ -28,7 +28,7 @@ public class ReviewController {
         }
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<List<BookReviewByReviewerNameDTO>> getReviewByReviewerName(@RequestParam(value = "reviewerName") String reviewerName) {
         List<BookReviewByReviewerNameDTO> bookReviewByReviewerNameDTOs = bookReviewAssembler.getReviewByReviewerName(reviewerName);
         if (!bookReviewByReviewerNameDTOs.isEmpty()) {
