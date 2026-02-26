@@ -40,11 +40,17 @@ public class BookController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Book> updateBook(@RequestBody Book book, @PathVariable Long id) {
-        Book updatedBook = bookAssembler.updateBook(book, id);
-        if (updatedBook != null) {
-            return new ResponseEntity<>(updatedBook, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Book updatedBook = bookAssembler.updateBook(book, id);
+            if (updatedBook != null) {
+                return new ResponseEntity<>(updatedBook, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -53,6 +59,8 @@ public class BookController {
         try {
             Book savedBook = bookAssembler.saveBook(book);
             return new ResponseEntity<>(savedBook, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -73,6 +81,16 @@ public class BookController {
     @GetMapping
     public ResponseEntity<List<BookWithAverageRatingDTO>> getBooksByAuthorName(@RequestParam(value = "authorName") String authorName) {
         List<BookWithAverageRatingDTO> bookWithAverageRatingDTOs = bookAssembler.getBooksByAuthorName(authorName);
+        if (!bookWithAverageRatingDTOs.isEmpty()) {
+            return new ResponseEntity<>(bookWithAverageRatingDTOs, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+    }
+
+    @GetMapping("/by-author/{authorId}")
+    public ResponseEntity<List<BookWithAverageRatingDTO>> getBooksByAuthorId(@PathVariable Long authorId) {
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOs = bookAssembler.getBooksByAuthorId(authorId);
         if (!bookWithAverageRatingDTOs.isEmpty()) {
             return new ResponseEntity<>(bookWithAverageRatingDTOs, HttpStatus.OK);
         } else {

@@ -7,26 +7,28 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import ru.mrhellko.library.Entity.Book;
 
-
 import java.util.List;
 
 @Service
 public class BookDAO {
 
-    private static final String GET_BOOK_BY_ID_SQL = "select b.id, b.book_name, b.author_name from books b where b.id = ?";
-    private static final String GET_ALL_BOOK_SQL = "select b.id, b.book_name, b.author_name from books b";
-    private static final String UPDATE_BOOK_BY_ID_SQL = "update books set book_name = ?, author_name = ? where id = ?";
-    private static final String SAVE_BOOK_SQL = "insert into books (id, book_name, author_name) values (?, ?, ?)";
+    private static final String GET_BOOK_BY_ID_SQL = "select b.id, b.book_name from books b where b.id = ?";
+    private static final String GET_ALL_BOOK_SQL = "select b.id, b.book_name from books b";
+    private static final String UPDATE_BOOK_BY_ID_SQL = "update books set book_name = ? where id = ?";
+    private static final String SAVE_BOOK_SQL = "insert into books (id, book_name) values (?, ?)";
+    private static final String SAVE_BOOK_AUTHOR_SQL = "insert into book_authors (id, book_id, author_id) values (?, ?, ?)";
     private static final String DELETE_BOOK_BY_ID_SQL = "delete from books where id = ?";
-    private static final String GET_BOOKS_BY_AUTHOR_NAME = "select b.id, b.book_name, b.author_name from books b where b.author_name ilike '%' || ? || '%'";
-    private static final String GET_NEXT_SEQUENCE_ID_SQL = "select nextval('books_seq') as id";
+    private static final String DELETE_BOOK_AUTHOR_SQL = "delete from book_authors where book_id = ? and author_id = ?";
+    private static final String GET_BOOKS_BY_AUTHOR_NAME = "select b.id, b.book_name from books b left join book_authors ba on b.id = ba.book_id left join authors a on ba.author_id = a.id where a.author_name ilike '%' || ? || '%'";
+    private static final String GET_NEXT_BOOK_SEQUENCE_ID_SQL = "select nextval('books_seq') as id";
+    private static final String GET_NEXT_BOOK_AUTHOR_SEQUENCE_ID_SQL = "select nextval('book_authors_seq') as id";
+    private static final String GET_BOOKS_BY_AUTHOR_ID = "select b.id, b.book_name from books b left join book_authors ba on b.id = ba.book_id left join authors a on ba.author_id = a.id where a.id = ?";
     @Autowired
     private JdbcTemplate jdbcTemplate;
     private final RowMapper<Book> bookRowMapper = (resultSet, _) -> {
         final Book book = new Book();
         book.setId(resultSet.getLong("id"));
         book.setBookName(resultSet.getString("book_name"));
-        book.setAuthor(resultSet.getString("author_name"));
         return book;
     };
     private final RowMapper<Long> idRowMapper = (resultSet, _) -> (Long) resultSet.getLong("id");
@@ -48,12 +50,12 @@ public class BookDAO {
     }
 
     public void updateBook(Book book) {
-        jdbcTemplate.update(UPDATE_BOOK_BY_ID_SQL, book.getBookName(), book.getAuthor(), book.getId());
+        jdbcTemplate.update(UPDATE_BOOK_BY_ID_SQL, book.getBookName(), book.getId());
     }
 
     public Book saveBook(Book book) throws Exception {
-        book.setId(jdbcTemplate.queryForObject(GET_NEXT_SEQUENCE_ID_SQL, idRowMapper));
-        jdbcTemplate.update(SAVE_BOOK_SQL, book.getId(), book.getBookName(), book.getAuthor());
+        book.setId(jdbcTemplate.queryForObject(GET_NEXT_BOOK_SEQUENCE_ID_SQL, idRowMapper));
+        jdbcTemplate.update(SAVE_BOOK_SQL, book.getId(), book.getBookName());
         return book;
     }
 
@@ -63,5 +65,18 @@ public class BookDAO {
 
     public List<Book> getBooksByAuthorName(String authorName) {
         return jdbcTemplate.query(GET_BOOKS_BY_AUTHOR_NAME, bookRowMapper, authorName);
+    }
+
+    public void saveBookAuthor(Long bookId, Long authorId) {
+        Long id = jdbcTemplate.queryForObject(GET_NEXT_BOOK_AUTHOR_SEQUENCE_ID_SQL, idRowMapper);
+        jdbcTemplate.update(SAVE_BOOK_AUTHOR_SQL, id, bookId, authorId);
+    }
+
+    public int deleteBookAuthor(Long bookId, Long authorId) throws Exception {
+        return jdbcTemplate.update(DELETE_BOOK_AUTHOR_SQL, bookId, authorId);
+    }
+
+    public List<Book> getBooksByAuthorId(Long authorId) {
+        return jdbcTemplate.query(GET_BOOKS_BY_AUTHOR_ID, bookRowMapper, authorId);
     }
 }
