@@ -62,12 +62,12 @@ class BookReviewAssemblerTest {
      */
     @Test
     void getReviewByReviewerNameTest() {
-        when(bookReviewDAO.getReviewByReviewerName("Sergei")).thenReturn(List.of(new BookReviewByReviewerNameDTO()));
+        when(bookReviewDAO.getReviewByReviewerName("Fiona")).thenReturn(List.of(new BookReviewByReviewerNameDTO()));
 
-        List<BookReviewByReviewerNameDTO> result = bookReviewAssembler.getReviewByReviewerName("Sergei");
+        List<BookReviewByReviewerNameDTO> result = bookReviewAssembler.getReviewByReviewerName("Fiona");
         assertThat(result).hasSize(1);
 
-        verify(bookReviewDAO).getReviewByReviewerName("Sergei");
+        verify(bookReviewDAO).getReviewByReviewerName("Fiona");
     }
 
     /**

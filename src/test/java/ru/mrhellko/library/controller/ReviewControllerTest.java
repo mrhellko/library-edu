@@ -91,7 +91,7 @@ class ReviewControllerTest {
         dto.setReviewText("text");
         dto.setRating((byte) 8);
         dto.setBookName("b");
-        dto.setAuthorName("a");
+        dto.setAuthorNames(List.of("a1", "a2"));
 
         when(bookReviewAssembler.getReviewByReviewerName("Sergei")).thenReturn(List.of(dto));
 
@@ -100,7 +100,8 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$[0].reviewText").value("text"))
                 .andExpect(jsonPath("$[0].rating").value(8))
                 .andExpect(jsonPath("$[0].bookName").value("b"))
-                .andExpect(jsonPath("$[0].authorName").value("a"));
+                .andExpect(jsonPath("$[0].authorNames[0]").value("a1"))
+                .andExpect(jsonPath("$[0].authorNames[1]").value("a2"));
     }
 
     /**

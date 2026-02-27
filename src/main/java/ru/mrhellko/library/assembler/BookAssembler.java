@@ -57,12 +57,14 @@ public class BookAssembler {
             added.removeAll(oldSet);
             for (Author author : added) {
                 bookDAO.saveBookAuthor(updatedBook.getId(), author.getId());
+                updatedBook.getAuthors().add(author);
             }
 
             Set<Author> removed = new HashSet<>(oldSet);
             removed.removeAll(newSet);
             for (Author author : removed) {
                 bookDAO.deleteBookAuthor(updatedBook.getId(), author.getId());
+                updatedBook.getAuthors().remove(author);
             }
 
             return updatedBook;

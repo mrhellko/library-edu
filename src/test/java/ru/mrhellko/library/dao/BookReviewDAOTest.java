@@ -80,7 +80,7 @@ public class BookReviewDAOTest {
                 .allMatch(r -> r.getReviewText() != null)
                 .allMatch(r -> r.getRating() != null)
                 .allMatch(r -> r.getBookName() != null)
-                .allMatch(r -> r.getAuthorName() != null);
+                .allMatch(r -> !r.getAuthorNames().isEmpty());
     }
 
     /**

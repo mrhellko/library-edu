@@ -17,35 +17,70 @@ public class BookDAOTest {
     private BookDAO bookDAO;
 
     /**
-     * Если автор не нашелся, то возвращается пустой список
+     * Если книги по имени автора не нашлись, то возвращается пустой список
      */
     @Test
-    void notFoundTest() {
+    void getBooksByAuthorNameNotFoundTest() {
         List<Book> books = bookDAO.getBooksByAuthorName("not existence author");
         assertThat(books).isEmpty();
     }
 
     /**
-     * По запросу "И" возвращает как минимум двух авторов
+     * По запросу "И" возвращает как минимум 5 книг
      */
     @Test
-    void foundManyTest() {
+    void getBooksByAuthorNameFoundManyTest() {
         List<Book> books = bookDAO.getBooksByAuthorName("И");
         assertThat(books)
-                .map(Book::getAuthor)
-                .contains("Лю Цысинь")
-                .contains("Джордж Мартин");
+                .map(Book::getBookName)
+                .contains("Задача трех тел")
+                .contains("Игра престолов")
+                .contains("Благие знамения")
+                .contains("Бесконечная земля")
+                .contains("Одноэтажная Америка");
     }
 
     /**
      * По запросу "Joan Rowling" возращает только те книги в которых автор Joan Rowling.
      */
     @Test
-    void foundOneTest() {
+    void getBooksByAuthorNameFoundOneTest() {
         List<Book> books = bookDAO.getBooksByAuthorName("Joan Rowling");
         assertThat(books)
-                .map(Book::getAuthor)
-                .allMatch(author -> author.equals("Joan Rowling"));
+                .map(Book::getBookName)
+                .allMatch(book -> book.equals("Гарри Поттер"));
+    }
+
+    /**
+     * Если книга по id автора не нашлась, то возвращается пустой список
+     */
+    @Test
+    void getBooksByAuthorIdNotFoundTest() {
+        List<Book> books = bookDAO.getBooksByAuthorId(99999L);
+        assertThat(books).isEmpty();
+    }
+
+    /**
+     * По запросу 4 возвращает как минимум две книги
+     */
+    @Test
+    void getBooksByAuthorIdFoundManyTest() {
+        List<Book> books = bookDAO.getBooksByAuthorId(4L);
+        assertThat(books)
+                .map(Book::getBookName)
+                .contains("Благие знамения")
+                .contains("Бесконечная земля");
+    }
+
+    /**
+     * По запросу 1 возращает только те книги в которых автор Joan Rowling.
+     */
+    @Test
+    void getBooksByAuthorIdFoundOneTest() {
+        List<Book> books = bookDAO.getBooksByAuthorId(1L);
+        assertThat(books)
+                .map(Book::getBookName)
+                .allMatch(book -> book.equals("Гарри Поттер"));
     }
 
     /**
@@ -66,7 +101,6 @@ public class BookDAOTest {
         assertThat(book).isNotNull();
         assertThat(book.getId()).isEqualTo(1);
         assertThat(book.getBookName()).isEqualTo("Гарри Поттер");
-        assertThat(book.getAuthor()).isEqualTo("Joan Rowling");
     }
 
     /**
@@ -75,12 +109,15 @@ public class BookDAOTest {
     @Test
     void getAllTest() {
         List<Book> books = bookDAO.getAll();
-        assertThat(books).hasSizeGreaterThanOrEqualTo(3);
+        assertThat(books).hasSizeGreaterThanOrEqualTo(6);
         assertThat(books)
-                .map(Book::getAuthor)
-                .contains("Joan Rowling")
-                .contains("Лю Цысинь")
-                .contains("Джордж Мартин");
+                .map(Book::getBookName)
+                .contains("Гарри Поттер")
+                .contains("Задача трех тел")
+                .contains("Игра престолов")
+                .contains("Благие знамения")
+                .contains("Бесконечная земля")
+                .contains("Одноэтажная Америка");
     }
 
     /**
@@ -92,13 +129,11 @@ public class BookDAOTest {
         assertThat(book).isNotNull();
 
         book.setBookName("Updated name");
-        book.setAuthor("Updated author");
         bookDAO.updateBook(book);
 
         Book updatedBook = bookDAO.getBookById(1);
         assertThat(updatedBook).isNotNull();
         assertThat(updatedBook.getBookName()).isEqualTo("Updated name");
-        assertThat(updatedBook.getAuthor()).isEqualTo("Updated author");
     }
 
     /**
@@ -108,7 +143,6 @@ public class BookDAOTest {
     void saveBookTest() throws Exception {
         Book newBook = new Book();
         newBook.setBookName("New book");
-        newBook.setAuthor("New author");
 
         Book saved = bookDAO.saveBook(newBook);
         assertThat(saved.getId()).isNotNull();
@@ -116,7 +150,6 @@ public class BookDAOTest {
         Book found = bookDAO.getBookById(saved.getId());
         assertThat(found).isNotNull();
         assertThat(found.getBookName()).isEqualTo("New book");
-        assertThat(found.getAuthor()).isEqualTo("New author");
     }
 
     /**
@@ -126,7 +159,6 @@ public class BookDAOTest {
     void deleteBookByIdTest() throws Exception {
         Book newBook = new Book();
         newBook.setBookName("Book to delete");
-        newBook.setAuthor("Author");
 
         Book saved = bookDAO.saveBook(newBook);
 

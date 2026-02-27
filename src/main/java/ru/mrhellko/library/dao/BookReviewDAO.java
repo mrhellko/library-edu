@@ -8,13 +8,19 @@ import org.springframework.stereotype.Service;
 import ru.mrhellko.library.Entity.BookReview;
 import ru.mrhellko.library.dto.BookReviewByReviewerNameDTO;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class BookReviewDAO {
     private static final String GET_REVIEW_BY_ID_SQL = "select r.id, r.book_id, r.rating, r.reviewer_name, r.review_text from book_reviews r where r.id = ?";
     private static final String GET_REVIEW_BY_ID_BOOK_SQL = "select r.id, r.book_id, r.rating, r.reviewer_name, r.review_text from book_reviews r where r.book_id = ?";
-    private static final String GET_REVIEW_BY_REVIEWER_NAME_SQL = "select r.review_text, r.rating, b.book_name, b.author_name from book_reviews r inner join books b on b.id = r.book_id where r.reviewer_name = ?";
+    private static final String GET_REVIEW_BY_REVIEWER_NAME_SQL = "select r.review_text, r.rating, b.book_name, string_agg(a.author_name, ', ') as authors " +
+            "from book_reviews r inner join books b on b.id = r.book_id " +
+            "inner join book_authors ba on ba.book_id = b.id " +
+            "inner join authors a on a.id = ba.author_id " +
+            "where r.reviewer_name = ? " +
+            "group by r.review_text, r.rating, b.book_name, b.id";
     private static final String UPDATE_REVIEW_BY_ID_SQL = "update book_reviews set book_id = ?, rating = ?, reviewer_name = ?, review_text = ? where id = ?";
     private static final String SAVE_REVIEW_SQL = "insert into book_reviews (id, book_id, rating, reviewer_name, review_text) values (?, ?, ?, ?, ?)";
     private static final String DELETE_REVIEW_BY_ID_SQL = "delete from book_reviews where id = ?";
@@ -35,7 +41,7 @@ public class BookReviewDAO {
         bookReviewByReviewerNameDTO.setReviewText(resultSet.getString("review_text"));
         bookReviewByReviewerNameDTO.setRating(resultSet.getByte("rating"));
         bookReviewByReviewerNameDTO.setBookName(resultSet.getString("book_name"));
-        bookReviewByReviewerNameDTO.setAuthorName(resultSet.getString("author_name"));
+        bookReviewByReviewerNameDTO.setAuthorNames(Arrays.stream(resultSet.getString("authors").split(", ")).toList());
         return bookReviewByReviewerNameDTO;
     };
     private final RowMapper<Long> idRowMapper = (resultSet, _) -> (Long) resultSet.getLong("id");

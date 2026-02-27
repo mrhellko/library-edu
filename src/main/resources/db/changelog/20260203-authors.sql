@@ -111,3 +111,7 @@ FROM books b
          JOIN authors a on a.author_name = 'Евгений Петров'
 where b.book_name = 'Одноэтажная Америка'
 ;
+
+--changeset EA:11
+INSERT INTO book_reviews (id, book_id, rating, reviewer_name, review_text)
+VALUES (nextval('book_reviews_seq'), 4, 10, 'Fiona', 'Перечитываю каждый месяц!');

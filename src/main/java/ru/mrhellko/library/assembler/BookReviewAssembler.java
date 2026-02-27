@@ -2,14 +2,19 @@ package ru.mrhellko.library.assembler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.mrhellko.library.Entity.Author;
+import ru.mrhellko.library.Entity.Book;
 import ru.mrhellko.library.Entity.BookReview;
 import ru.mrhellko.library.dao.BookReviewDAO;
+import ru.mrhellko.library.dto.BookAuthorDTO;
 import ru.mrhellko.library.dto.BookReviewByBookIdDTO;
 import ru.mrhellko.library.dto.BookReviewByReviewerNameDTO;
 import ru.mrhellko.library.exception.NotFoundException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BookReviewAssembler {
@@ -57,4 +62,5 @@ public class BookReviewAssembler {
             throw new NotFoundException(id);
         }
     }
+
 }
