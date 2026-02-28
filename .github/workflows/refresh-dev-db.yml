@@ -48,7 +48,7 @@ jobs:
           rm -f /tmp/prod.dump
           pg_dump -Fc -d "$PROD_DB" --no-owner --no-privileges -f /tmp/prod.dump
 
-      - name: Recreate dev DB with fixed owner (no privilege changes on restore)
+      - name: Recreate dev DB and restore as egrishkova (then grant app_dev_user)
         env:
           PGHOST: 127.0.0.1
           PGPORT: "5432"
@@ -56,6 +56,7 @@ jobs:
           PGPASSWORD: ${{ secrets.PGPASSWORD_REFRESH }}
           DEV_DB: library_dev
           DEV_OWNER: egrishkova
+          DEV_APP_USER: app_dev_user
         run: |
           set -euo pipefail
 
@@ -66,12 +67,30 @@ jobs:
             WHERE datname = '$DEV_DB' AND pid <> pg_backend_pid();
           "
 
-          # drop & create dev with owner you want (ownership is controlled here)
+          # drop & create dev with fixed owner
           dropdb --if-exists "$DEV_DB"
           createdb --owner="$DEV_OWNER" "$DEV_DB"
 
-          # restore: do NOT apply owners/privileges from dump
-          pg_restore -d "$DEV_DB" --no-owner --no-privileges --clean --if-exists /tmp/prod.dump
+          # restore:
+          # - do NOT import owners/privileges from prod
+          # - but CREATE objects under DEV_OWNER via SET ROLE (requires: GRANT egrishkova TO gha_refresh_user)
+          pg_restore -d "$DEV_DB" \
+            --role="$DEV_OWNER" \
+            --no-owner --no-privileges \
+            --clean --if-exists \
+            /tmp/prod.dump
+
+          # ensure app user has rights in dev
+          psql -d "$DEV_DB" -v ON_ERROR_STOP=1 -c "
+            GRANT USAGE ON SCHEMA public TO $DEV_APP_USER;
+            GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO $DEV_APP_USER;
+            GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO $DEV_APP_USER;
+
+            ALTER DEFAULT PRIVILEGES FOR ROLE $DEV_OWNER IN SCHEMA public
+              GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $DEV_APP_USER;
+            ALTER DEFAULT PRIVILEGES FOR ROLE $DEV_OWNER IN SCHEMA public
+              GRANT USAGE, SELECT ON SEQUENCES TO $DEV_APP_USER;
+          "
 
       - name: Cleanup
         if: always()
