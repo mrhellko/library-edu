@@ -1,0 +1,1 @@
+start "" ssh -N -L 15432:127.0.0.1:5432 ssh-egrishkova@mrhellko.ru
