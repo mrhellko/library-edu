@@ -1,0 +1,81 @@
+name: Refresh library_dev from library
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type YES to refresh dev DB from prod"
+        required: true
+        default: "NO"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  refresh:
+    runs-on: self-hosted
+    environment: dev-db
+
+    steps:
+      - name: Safety check
+        run: |
+          if [[ "${{ github.event.inputs.confirm }}" != "YES" ]]; then
+            echo "Confirmation not provided. Aborting."
+            exit 1
+          fi
+
+      - name: Verify PostgreSQL tools exist
+        run: |
+          command -v psql >/dev/null 2>&1 || (echo "psql not found" && exit 1)
+          command -v pg_dump >/dev/null 2>&1 || (echo "pg_dump not found" && exit 1)
+          command -v pg_restore >/dev/null 2>&1 || (echo "pg_restore not found" && exit 1)
+          command -v dropdb >/dev/null 2>&1 || (echo "dropdb not found" && exit 1)
+          command -v createdb >/dev/null 2>&1 || (echo "createdb not found" && exit 1)
+
+      - name: Dump prod (no owner, no privileges)
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: "5432"
+          PGUSER: ${{ secrets.PGUSER_REFRESH }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD_REFRESH }}
+          PROD_DB: library
+        run: |
+          set -euo pipefail
+          rm -f /tmp/prod.dump
+          pg_dump -Fc -d "$PROD_DB" --no-owner --no-privileges -f /tmp/prod.dump
+
+      - name: Recreate dev DB with fixed owner (no privilege changes on restore)
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: "5432"
+          PGUSER: ${{ secrets.PGUSER_REFRESH }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD_REFRESH }}
+          DEV_DB: library_dev
+          DEV_OWNER: egrishkova
+        run: |
+          set -euo pipefail
+
+          # terminate connections to dev
+          psql -d postgres -v ON_ERROR_STOP=1 -c "
+            SELECT pg_terminate_backend(pid)
+            FROM pg_stat_activity
+            WHERE datname = '$DEV_DB' AND pid <> pg_backend_pid();
+          "
+
+          # drop & create dev with owner you want (ownership is controlled here)
+          dropdb --if-exists "$DEV_DB"
+          createdb --owner="$DEV_OWNER" "$DEV_DB"
+
+          # restore: do NOT apply owners/privileges from dump
+          pg_restore -d "$DEV_DB" --no-owner --no-privileges --clean --if-exists /tmp/prod.dump
+
+      - name: Cleanup
+        if: always()
+        run: rm -f /tmp/prod.dump
+
+      - name: Done
+        run: echo "library_dev refreshed from library."
