@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.mrhellko.library.Entity.Author;
-import ru.mrhellko.library.assembler.AuthorAssembler;
+import ru.mrhellko.library.assembler.AuthorService;
 import ru.mrhellko.library.exception.NotFoundException;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -31,14 +31,14 @@ public class AuthorControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private AuthorAssembler authorAssembler;
+    private AuthorService authorService;
 
     /**
      * Если автор не найден, то эндпоинт /authors/{id} возвращает 404 Not Found.
      */
     @Test
     void getAuthorByIdNotFoundTest() throws Exception {
-        when(authorAssembler.getAuthorById(1L)).thenReturn(null);
+        when(authorService.getAuthorById(1L)).thenReturn(null);
 
         mockMvc.perform(get("/authors/1"))
                 .andExpect(status().isNotFound());
@@ -53,7 +53,7 @@ public class AuthorControllerTest {
         author.setId(1L);
         author.setAuthorName("name");
 
-        when(authorAssembler.getAuthorById(1L)).thenReturn(author);
+        when(authorService.getAuthorById(1L)).thenReturn(author);
 
         mockMvc.perform(get("/authors/1"))
                 .andExpect(status().isOk())
@@ -66,7 +66,7 @@ public class AuthorControllerTest {
      */
     @Test
     void updateAuthorNotFoundTest() throws Exception {
-        when(authorAssembler.updateAuthor(any(Author.class), eq(1L))).thenReturn(null);
+        when(authorService.updateAuthor(any(Author.class), eq(1L))).thenReturn(null);
 
         Author request = new Author();
         request.setId(1L);
@@ -87,7 +87,7 @@ public class AuthorControllerTest {
         updated.setId(1L);
         updated.setAuthorName("name");
 
-        when(authorAssembler.updateAuthor(any(Author.class), eq(1L))).thenReturn(updated);
+        when(authorService.updateAuthor(any(Author.class), eq(1L))).thenReturn(updated);
 
         Author request = new Author();
         request.setId(1L);
@@ -106,7 +106,7 @@ public class AuthorControllerTest {
      */
     @Test
     void saveAuthorInternalServerErrorTest() throws Exception {
-        when(authorAssembler.saveAuthor(any(Author.class))).thenThrow(new RuntimeException("boom"));
+        when(authorService.saveAuthor(any(Author.class))).thenThrow(new RuntimeException("boom"));
 
         Author request = new Author();
         request.setId(1L);
@@ -127,7 +127,7 @@ public class AuthorControllerTest {
         saved.setId(1L);
         saved.setAuthorName("name");
 
-        when(authorAssembler.saveAuthor(any(Author.class))).thenReturn(saved);
+        when(authorService.saveAuthor(any(Author.class))).thenReturn(saved);
 
         Author request = new Author();
         request.setId(1L);
@@ -146,7 +146,7 @@ public class AuthorControllerTest {
      */
     @Test
     void deleteAuthorNotFoundTest() throws Exception {
-        doThrow(new NotFoundException(1)).when(authorAssembler).deleteAuthor(1L);
+        doThrow(new NotFoundException(1)).when(authorService).deleteAuthor(1L);
 
         mockMvc.perform(delete("/authors/1"))
                 .andExpect(status().isNotFound());
@@ -157,7 +157,7 @@ public class AuthorControllerTest {
      */
     @Test
     void deleteAuthorInternalServerErrorTest() throws Exception {
-        doThrow(new RuntimeException("boom")).when(authorAssembler).deleteAuthor(1L);
+        doThrow(new RuntimeException("boom")).when(authorService).deleteAuthor(1L);
 
         mockMvc.perform(delete("/authors/1"))
                 .andExpect(status().isInternalServerError());
@@ -168,7 +168,7 @@ public class AuthorControllerTest {
      */
     @Test
     void deleteAuthorOkTest() throws Exception {
-        doNothing().when(authorAssembler).deleteAuthor(1L);
+        doNothing().when(authorService).deleteAuthor(1L);
 
         mockMvc.perform(delete("/authors/1"))
                 .andExpect(status().isOk());

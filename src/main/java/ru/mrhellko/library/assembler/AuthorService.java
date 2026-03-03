@@ -7,7 +7,7 @@ import ru.mrhellko.library.dao.AuthorDAO;
 import ru.mrhellko.library.exception.NotFoundException;
 
 @Service
-public class AuthorAssembler {
+public class AuthorService {
     @Autowired
     private AuthorDAO authorDAO;
 

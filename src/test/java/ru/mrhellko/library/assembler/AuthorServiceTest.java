@@ -15,13 +15,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthorAssemblerTest {
+public class AuthorServiceTest {
 
     @Mock
     private AuthorDAO authorDAO;
 
     @InjectMocks
-    private AuthorAssembler authorAssembler;
+    private AuthorService authorService;
 
     /**
      * Если по id нет автора, то возвращается null.
@@ -30,7 +30,7 @@ public class AuthorAssemblerTest {
     void getAuthorByIdNotFoundTest() {
         when(authorDAO.getAuthorById(1L)).thenReturn(null);
 
-        Author author = authorAssembler.getAuthorById(1L);
+        Author author = authorService.getAuthorById(1L);
         assertThat(author).isNull();
     }
 
@@ -45,7 +45,7 @@ public class AuthorAssemblerTest {
 
         when(authorDAO.getAuthorById(1L)).thenReturn(author);
 
-        Author foundAuthor = authorAssembler.getAuthorById(1L);
+        Author foundAuthor = authorService.getAuthorById(1L);
         assertThat(foundAuthor.getId()).isEqualTo(1);
         assertThat(foundAuthor.getAuthorName()).isEqualTo("name");
     }
@@ -60,7 +60,7 @@ public class AuthorAssemblerTest {
         Author input = new Author();
         input.setId(1L);
 
-        Author updated = authorAssembler.updateAuthor(input, 1L);
+        Author updated = authorService.updateAuthor(input, 1L);
         assertThat(updated).isNull();
 
         verify(authorDAO).getAuthorById(1L);
@@ -80,7 +80,7 @@ public class AuthorAssemblerTest {
         Author input = new Author();
         input.setAuthorName("name");
 
-        Author updated = authorAssembler.updateAuthor(input, 1L);
+        Author updated = authorService.updateAuthor(input, 1L);
         assertThat(updated).isNotNull();
         assertThat(updated.getId()).isEqualTo(1L);
         assertThat(updated.getAuthorName()).isEqualTo("name");
@@ -99,7 +99,7 @@ public class AuthorAssemblerTest {
 
         when(authorDAO.saveAuthor(input)).thenReturn(saved);
 
-        Author result = authorAssembler.saveAuthor(input);
+        Author result = authorService.saveAuthor(input);
         assertThat(result).isSameAs(saved);
     }
 
@@ -110,7 +110,7 @@ public class AuthorAssemblerTest {
     void deleteAuthorByIdNotFoundTest() throws Exception {
         when(authorDAO.deleteAuthorById(1L)).thenReturn(0);
 
-        assertThatThrownBy(() -> authorAssembler.deleteAuthor(1L))
+        assertThatThrownBy(() -> authorService.deleteAuthor(1L))
                 .isInstanceOf(NotFoundException.class);
 
         verify(authorDAO).deleteAuthorById(1L);
@@ -123,7 +123,7 @@ public class AuthorAssemblerTest {
     void deleteAuthorByIdOkTest() throws Exception {
         when(authorDAO.deleteAuthorById(1L)).thenReturn(1);
 
-        authorAssembler.deleteAuthor(1L);
+        authorService.deleteAuthor(1L);
 
         verify(authorDAO).deleteAuthorById(1L);
     }

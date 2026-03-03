@@ -16,13 +16,19 @@ public class BookDAO {
     private static final String GET_ALL_BOOK_SQL = "select b.id, b.book_name from books b";
     private static final String UPDATE_BOOK_BY_ID_SQL = "update books set book_name = ? where id = ?";
     private static final String SAVE_BOOK_SQL = "insert into books (id, book_name) values (?, ?)";
-    private static final String SAVE_BOOK_AUTHOR_SQL = "insert into book_authors (id, book_id, author_id) values (?, ?, ?)";
+    private static final String SAVE_BOOK_AUTHOR_SQL = "insert into book_authors (book_id, author_id) values (?, ?)";
     private static final String DELETE_BOOK_BY_ID_SQL = "delete from books where id = ?";
     private static final String DELETE_BOOK_AUTHOR_SQL = "delete from book_authors where book_id = ? and author_id = ?";
-    private static final String GET_BOOKS_BY_AUTHOR_NAME = "select b.id, b.book_name from books b left join book_authors ba on b.id = ba.book_id left join authors a on ba.author_id = a.id where a.author_name ilike '%' || ? || '%'";
+    private static final String GET_BOOKS_BY_AUTHOR_NAME = """
+    select b.id, b.book_name from books b 
+        left join book_authors ba on b.id = ba.book_id 
+        join authors a on ba.author_id = a.id 
+                             where a.author_name ilike '%' || ? || '%'""";
     private static final String GET_NEXT_BOOK_SEQUENCE_ID_SQL = "select nextval('books_seq') as id";
-    private static final String GET_NEXT_BOOK_AUTHOR_SEQUENCE_ID_SQL = "select nextval('book_authors_seq') as id";
-    private static final String GET_BOOKS_BY_AUTHOR_ID = "select b.id, b.book_name from books b left join book_authors ba on b.id = ba.book_id left join authors a on ba.author_id = a.id where a.id = ?";
+    private static final String GET_BOOKS_BY_AUTHOR_ID = """
+select b.id, b.book_name from books b 
+    left join book_authors ba on b.id = ba.book_id
+                         where ba.author_id = ?""";
     @Autowired
     private JdbcTemplate jdbcTemplate;
     private final RowMapper<Book> bookRowMapper = (resultSet, _) -> {
@@ -68,8 +74,7 @@ public class BookDAO {
     }
 
     public void saveBookAuthor(Long bookId, Long authorId) {
-        Long id = jdbcTemplate.queryForObject(GET_NEXT_BOOK_AUTHOR_SEQUENCE_ID_SQL, idRowMapper);
-        jdbcTemplate.update(SAVE_BOOK_AUTHOR_SQL, id, bookId, authorId);
+        jdbcTemplate.update(SAVE_BOOK_AUTHOR_SQL, bookId, authorId);
     }
 
     public int deleteBookAuthor(Long bookId, Long authorId) throws Exception {

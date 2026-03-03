@@ -120,7 +120,7 @@ public class BookAssembler {
         return bookReviews.isEmpty() ? null : (float) sum / bookReviews.size();
     }
 
-    public void fillBooksWithAuthors(List<Book> books) {
+    private void fillBooksWithAuthors(List<Book> books) {
         Map<Long, Book> bookIndex = new HashMap<>();
         for (Book book : books) {
             bookIndex.put(book.getId(), book);
@@ -133,13 +133,14 @@ public class BookAssembler {
         }
     }
 
-    public void validateBook(Book book) throws IllegalArgumentException {
+    private void validateBook(Book book) throws IllegalArgumentException {
         if (book.getAuthors().isEmpty()) {
             throw new IllegalArgumentException("No authors");
         }
         for (Author author : book.getAuthors()) {
             if (authorDAO.getAuthorById(author.getId()) == null) {
-                throw new IllegalArgumentException("Bad author");
+                throw new IllegalArgumentException("Bad author: " + author.getAuthorName() +
+                        "\nYou need to create new author before updating book");
             }
         }
     }

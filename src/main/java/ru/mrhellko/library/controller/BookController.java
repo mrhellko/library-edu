@@ -39,7 +39,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(@RequestBody Book book, @PathVariable Long id) {
+    public ResponseEntity<?> updateBook(@RequestBody Book book, @PathVariable Long id) {
         try {
             Book updatedBook = bookAssembler.updateBook(book, id);
             if (updatedBook != null) {
@@ -48,19 +48,19 @@ public class BookController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/")
-    public ResponseEntity<Book> saveBook(@RequestBody Book book) {
+    public ResponseEntity<?> saveBook(@RequestBody Book book) {
         try {
             Book savedBook = bookAssembler.saveBook(book);
             return new ResponseEntity<>(savedBook, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

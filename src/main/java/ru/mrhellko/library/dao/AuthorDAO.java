@@ -18,13 +18,14 @@ public class AuthorDAO {
     private static final String GET_NEXT_SEQUENCE_ID_SQL = "select nextval('authors_seq') as id";
     private static final String SAVE_AUTHOR_SQL = "insert into authors (id, author_name) values (?, ?)";
     private static final String DELETE_AUTHOR_BY_ID_SQL = "delete from authors where id = ?";
-    private static final String GET_AUTHORS_FOR_BOOKS_SQL = "select b.id as book_id, a.id as author_id, a.author_name\n" +
-            "from AUTHORS a\n" +
-            "    left join book_authors ba\n" +
-            "        on a.id = ba.AUTHOR_ID\n" +
-            "    left join books b\n" +
-            "        on ba.BOOK_ID = b.id\n" +
-            "where b.id IN (:bookIds)";
+    private static final String GET_AUTHORS_FOR_BOOKS_SQL = """
+select b.id as book_id, a.id as author_id, a.author_name
+            from AUTHORS a
+                left join book_authors ba
+                    on a.id = ba.AUTHOR_ID
+                left join books b
+                    on ba.BOOK_ID = b.id
+            where b.id IN (:bookIds)""";
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
