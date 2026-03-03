@@ -39,7 +39,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBook(@RequestBody Book book, @PathVariable Long id) throws Exception {
+    public ResponseEntity<Book> updateBook(@RequestBody Book book, @PathVariable Long id) throws Exception {
         Book updatedBook = bookAssembler.updateBook(book, id);
         if (updatedBook != null) {
             return new ResponseEntity<>(updatedBook, HttpStatus.OK);
@@ -49,7 +49,7 @@ public class BookController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> saveBook(@RequestBody Book book) throws Exception {
+    public ResponseEntity<Book> saveBook(@RequestBody Book book) throws Exception {
         Book savedBook = bookAssembler.saveBook(book);
         return new ResponseEntity<>(savedBook, HttpStatus.OK);
     }
