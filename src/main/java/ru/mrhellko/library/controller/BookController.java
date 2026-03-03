@@ -34,48 +34,30 @@ public class BookController {
         if (bookWithAverageRatingDTO != null) {
             return new ResponseEntity<>(bookWithAverageRatingDTO, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NotFoundException(id);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBook(@RequestBody Book book, @PathVariable Long id) {
-        try {
-            Book updatedBook = bookAssembler.updateBook(book, id);
-            if (updatedBook != null) {
-                return new ResponseEntity<>(updatedBook, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<?> updateBook(@RequestBody Book book, @PathVariable Long id) throws Exception {
+        Book updatedBook = bookAssembler.updateBook(book, id);
+        if (updatedBook != null) {
+            return new ResponseEntity<>(updatedBook, HttpStatus.OK);
+        } else {
+            throw new NotFoundException(id);
         }
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> saveBook(@RequestBody Book book) {
-        try {
-            Book savedBook = bookAssembler.saveBook(book);
-            return new ResponseEntity<>(savedBook, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<?> saveBook(@RequestBody Book book) throws Exception {
+        Book savedBook = bookAssembler.saveBook(book);
+        return new ResponseEntity<>(savedBook, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBookById(@PathVariable Long id) {
-        try {
-            bookAssembler.deleteBook(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Void> deleteBookById(@PathVariable Long id) throws Exception {
+        bookAssembler.deleteBook(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping
@@ -96,5 +78,20 @@ public class BookController {
         } else {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGenericException(Exception e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
