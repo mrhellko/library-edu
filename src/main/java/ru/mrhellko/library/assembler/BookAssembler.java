@@ -41,7 +41,7 @@ public class BookAssembler {
         return fillListOfBookWithAverageRatingDTO(books);
     }
 
-    public Book updateBook(Book book, Long id) throws Exception {
+    public Book updateBook(Book book, Long id) {
         validateBook(book);
         Book updatedBook = bookDAO.getBookById(id);
         if (updatedBook != null) {
@@ -73,7 +73,7 @@ public class BookAssembler {
         }
     }
 
-    public Book saveBook(Book book) throws Exception {
+    public Book saveBook(Book book) {
         validateBook(book);
         Book savedBook = bookDAO.saveBook(book);
         for (Author author : savedBook.getAuthors()) {
@@ -82,7 +82,7 @@ public class BookAssembler {
         return savedBook;
     }
 
-    public void deleteBook(Long id) throws Exception {
+    public void deleteBook(Long id) {
         int resultBook = bookDAO.deleteBookById(id);
         if (resultBook == 0) {
             throw new NotFoundException(id);

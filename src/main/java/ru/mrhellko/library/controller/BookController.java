@@ -39,7 +39,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(@RequestBody Book book, @PathVariable Long id) throws Exception {
+    public ResponseEntity<Book> updateBook(@RequestBody Book book, @PathVariable Long id) {
         Book updatedBook = bookAssembler.updateBook(book, id);
         if (updatedBook != null) {
             return new ResponseEntity<>(updatedBook, HttpStatus.OK);
@@ -49,13 +49,13 @@ public class BookController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Book> saveBook(@RequestBody Book book) throws Exception {
+    public ResponseEntity<Book> saveBook(@RequestBody Book book) {
         Book savedBook = bookAssembler.saveBook(book);
         return new ResponseEntity<>(savedBook, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBookById(@PathVariable Long id) throws Exception {
+    public ResponseEntity<Void> deleteBookById(@PathVariable Long id) {
         bookAssembler.deleteBook(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -78,20 +78,5 @@ public class BookController {
         } else {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGenericException(Exception e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

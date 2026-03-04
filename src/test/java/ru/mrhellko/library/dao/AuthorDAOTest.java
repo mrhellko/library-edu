@@ -60,7 +60,7 @@ public class AuthorDAOTest {
      * Сохранение нового автора присваивает id и позволяет прочитать автора из базы данных.
      */
     @Test
-    void saveAuthorTest() throws Exception {
+    void saveAuthorTest() {
         Author newAuthor = new Author();
         newAuthor.setAuthorName("name");
 
@@ -76,7 +76,7 @@ public class AuthorDAOTest {
      * Удаление существующего автора возвращает 1 и автор перестаёт находиться по id.
      */
     @Test
-    void deleteAuthorByIdTest() throws Exception {
+    void deleteAuthorByIdTest() {
         Author newAuthor = new Author();
         newAuthor.setAuthorName("name");
 
@@ -91,7 +91,7 @@ public class AuthorDAOTest {
      * Удаление несуществующего автора возвращает 0.
      */
     @Test
-    void deleteAuthorByIdNotFoundTest() throws Exception {
+    void deleteAuthorByIdNotFoundTest() {
         int deleted = authorDAO.deleteAuthorById(99999L);
         assertThat(deleted).isEqualTo(0);
     }
@@ -100,7 +100,7 @@ public class AuthorDAOTest {
      * По сету из нескольких bookId возвращает List из BookAuthorDTO
      */
     @Test
-    void getAuthorsForBooksManyFound() throws Exception {
+    void getAuthorsForBooksManyFound() {
         Set<Long> bookIds = new HashSet<>(Set.of(1L, 2L, 3L, 4L, 5L, 6L));
 
         List<BookAuthorDTO> bookAuthorDTOS = authorDAO.getAuthorsForBooks(bookIds);
@@ -122,7 +122,7 @@ public class AuthorDAOTest {
      * По пустому сету bookIds возвращает пустую коллекцию.
      */
     @Test
-    void getAuthorsForBooksEmptyBookId() throws Exception {
+    void getAuthorsForBooksEmptyBookId() {
         Set<Long> bookIds = new HashSet<>();
         List<BookAuthorDTO> dto = authorDAO.getAuthorsForBooks(bookIds);
 

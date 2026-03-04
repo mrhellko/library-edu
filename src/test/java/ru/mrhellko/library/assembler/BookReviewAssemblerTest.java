@@ -118,7 +118,7 @@ class BookReviewAssemblerTest {
      * Сохранение отзыва делегируется в DAO и возвращает результат сохранения.
      */
     @Test
-    void saveBookReviewTest() throws Exception {
+    void saveBookReviewTest() {
         BookReview input = new BookReview();
         BookReview saved = new BookReview();
         saved.setId(10L);
@@ -133,7 +133,7 @@ class BookReviewAssemblerTest {
      * Если удаление отзыва в DAO вернуло 0, то выбрасывается NotFoundException.
      */
     @Test
-    void deleteBookReviewByIdNotFoundTest() throws Exception {
+    void deleteBookReviewByIdNotFoundTest() {
         when(bookReviewDAO.deleteBookReviewById(1L)).thenReturn(0);
 
         assertThatThrownBy(() -> bookReviewAssembler.deleteBookReviewById(1L))
@@ -146,7 +146,7 @@ class BookReviewAssemblerTest {
      * Если удаление отзыва прошло успешно, то исключение не выбрасывается.
      */
     @Test
-    void deleteBookReviewByIdOkTest() throws Exception {
+    void deleteBookReviewByIdOkTest() {
         when(bookReviewDAO.deleteBookReviewById(1L)).thenReturn(1);
 
         bookReviewAssembler.deleteBookReviewById(1L);

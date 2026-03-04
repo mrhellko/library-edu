@@ -28,11 +28,11 @@ public class AuthorService {
         }
     }
 
-    public Author saveAuthor(Author author) throws Exception {
+    public Author saveAuthor(Author author) {
         return authorDAO.saveAuthor(author);
     }
 
-    public void deleteAuthor(Long id) throws Exception {
+    public void deleteAuthor(Long id) {
         int resultAuthor = authorDAO.deleteAuthorById(id);
         if (resultAuthor == 0) {
             throw new NotFoundException(id);

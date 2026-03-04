@@ -85,7 +85,7 @@ public class BookReviewDAO {
                 bookReview.getId());
     }
 
-    public BookReview saveBookReview(BookReview bookReview) throws Exception {
+    public BookReview saveBookReview(BookReview bookReview) {
         bookReview.setId(jdbcTemplate.queryForObject(GET_NEXT_SEQUENCE_ID_SQL, idRowMapper));
         jdbcTemplate.update(SAVE_REVIEW_SQL,
                 bookReview.getId(),
@@ -96,7 +96,7 @@ public class BookReviewDAO {
         return bookReview;
     }
 
-    public int deleteBookReviewById(Long id) throws Exception {
+    public int deleteBookReviewById(Long id) {
         return jdbcTemplate.update(DELETE_REVIEW_BY_ID_SQL, id);
     }
 }

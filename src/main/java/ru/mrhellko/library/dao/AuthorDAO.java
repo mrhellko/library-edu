@@ -19,13 +19,13 @@ public class AuthorDAO {
     private static final String SAVE_AUTHOR_SQL = "insert into authors (id, author_name) values (?, ?)";
     private static final String DELETE_AUTHOR_BY_ID_SQL = "delete from authors where id = ?";
     private static final String GET_AUTHORS_FOR_BOOKS_SQL = """
-select b.id as book_id, a.id as author_id, a.author_name
-            from AUTHORS a
-                left join book_authors ba
-                    on a.id = ba.AUTHOR_ID
-                left join books b
-                    on ba.BOOK_ID = b.id
-            where b.id IN (:bookIds)""";
+            select b.id as book_id, a.id as author_id, a.author_name
+                        from AUTHORS a
+                            left join book_authors ba
+                                on a.id = ba.AUTHOR_ID
+                            left join books b
+                                on ba.BOOK_ID = b.id
+                        where b.id IN (:bookIds)""";
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
@@ -61,7 +61,7 @@ select b.id as book_id, a.id as author_id, a.author_name
         jdbcTemplate.update(UPDATE_AUTHOR_BY_ID_SQL, author.getAuthorName(), author.getId());
     }
 
-    public Author saveAuthor(Author author) throws Exception {
+    public Author saveAuthor(Author author) {
         author.setId(jdbcTemplate.queryForObject(GET_NEXT_SEQUENCE_ID_SQL, idRowMapper));
         jdbcTemplate.update(SAVE_AUTHOR_SQL, author.getId(), author.getAuthorName());
         return author;

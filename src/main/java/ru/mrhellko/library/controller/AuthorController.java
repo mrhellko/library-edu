@@ -20,7 +20,7 @@ public class AuthorController {
         if (author != null) {
             return new ResponseEntity<>(author, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NotFoundException(id);
         }
     }
 
@@ -30,29 +30,19 @@ public class AuthorController {
         if (updatedAuthor != null) {
             return new ResponseEntity<>(updatedAuthor, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NotFoundException(id);
         }
     }
 
     @PostMapping("/")
     public ResponseEntity<Author> saveAuthor(@RequestBody Author author) {
-        try {
-            Author savedAuthor = authorService.saveAuthor(author);
-            return new ResponseEntity<>(savedAuthor, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Author savedAuthor = authorService.saveAuthor(author);
+        return new ResponseEntity<>(savedAuthor, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAuthorById(@PathVariable Long id) {
-        try {
-            authorService.deleteAuthor(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        authorService.deleteAuthor(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

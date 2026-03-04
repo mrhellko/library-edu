@@ -44,29 +44,19 @@ public class ReviewController {
         if (updatedBookReview != null) {
             return new ResponseEntity<>(updatedBookReview, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NotFoundException(id);
         }
     }
 
     @PostMapping("/")
     public ResponseEntity<BookReview> saveBookReview(@RequestBody BookReview bookReview) {
-        try {
-            BookReview savedBookReview = bookReviewAssembler.saveBookReview(bookReview);
-            return new ResponseEntity<>(savedBookReview, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        BookReview savedBookReview = bookReviewAssembler.saveBookReview(bookReview);
+        return new ResponseEntity<>(savedBookReview, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBookReviewById(@PathVariable Long id) {
-        try {
-            bookReviewAssembler.deleteBookReviewById(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        bookReviewAssembler.deleteBookReviewById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -180,7 +180,7 @@ class BookAssemblerTest {
      * Если книга для обновления не найдена, то возвращается null и update не вызывается.
      */
     @Test
-    void updateBookNotFoundTest() throws Exception {
+    void updateBookNotFoundTest() {
         Book input = new Book();
         input.setBookName("n");
         Author author = new Author(1L, "a");
@@ -200,7 +200,7 @@ class BookAssemblerTest {
      * Если книга найдена, то поля обновляются и update вызывается для существующей книги.
      */
     @Test
-    void updateBookFoundTest() throws Exception {
+    void updateBookFoundTest() {
         Book existing = new Book();
         existing.setId(1L);
         existing.setBookName("old");
@@ -234,7 +234,7 @@ class BookAssemblerTest {
      * Сохранение книги делегируется в DAO и возвращает результат сохранения.
      */
     @Test
-    void saveBookTest() throws Exception {
+    void saveBookTest() {
         Book input = new Book();
         input.setBookName("n");
         Author author = new Author(1L, "a");
@@ -257,7 +257,7 @@ class BookAssemblerTest {
      * Если удаление книги в DAO вернуло 0, то выбрасывается NotFoundException.
      */
     @Test
-    void deleteBookNotFoundTest() throws Exception {
+    void deleteBookNotFoundTest() {
         when(bookDAO.deleteBookById(1L)).thenReturn(0);
 
         assertThatThrownBy(() -> bookAssembler.deleteBook(1L))
@@ -270,7 +270,7 @@ class BookAssemblerTest {
      * Если удаление книги прошло успешно, то исключение не выбрасывается.
      */
     @Test
-    void deleteBookOkTest() throws Exception {
+    void deleteBookOkTest() {
         when(bookDAO.deleteBookById(1L)).thenReturn(1);
 
         bookAssembler.deleteBook(1L);

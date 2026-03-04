@@ -140,7 +140,7 @@ public class BookDAOTest {
      * Сохранение новой книги присваивает id и позволяет прочитать книгу из базы данных.
      */
     @Test
-    void saveBookTest() throws Exception {
+    void saveBookTest() {
         Book newBook = new Book();
         newBook.setBookName("New book");
 
@@ -156,7 +156,7 @@ public class BookDAOTest {
      * Удаление существующей книги возвращает 1 и книга перестаёт находиться по id.
      */
     @Test
-    void deleteBookByIdTest() throws Exception {
+    void deleteBookByIdTest() {
         Book newBook = new Book();
         newBook.setBookName("Book to delete");
 
@@ -171,7 +171,7 @@ public class BookDAOTest {
      * Удаление несуществующей книги возвращает 0.
      */
     @Test
-    void deleteBookByIdNotFoundTest() throws Exception {
+    void deleteBookByIdNotFoundTest() {
         int deleted = bookDAO.deleteBookById(99999L);
         assertThat(deleted).isEqualTo(0);
     }

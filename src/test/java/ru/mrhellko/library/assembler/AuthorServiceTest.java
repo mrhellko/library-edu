@@ -92,7 +92,7 @@ public class AuthorServiceTest {
      * Сохранение автора делегируется в DAO и возвращает результат сохранения.
      */
     @Test
-    void saveAuthorTest() throws Exception {
+    void saveAuthorTest() {
         Author input = new Author();
         Author saved = new Author();
         saved.setId(10L);
@@ -107,7 +107,7 @@ public class AuthorServiceTest {
      * Если удаление автора в DAO вернуло 0, то выбрасывается NotFoundException.
      */
     @Test
-    void deleteAuthorByIdNotFoundTest() throws Exception {
+    void deleteAuthorByIdNotFoundTest() {
         when(authorDAO.deleteAuthorById(1L)).thenReturn(0);
 
         assertThatThrownBy(() -> authorService.deleteAuthor(1L))
@@ -120,7 +120,7 @@ public class AuthorServiceTest {
      * Если удаление автора прошло успешно, то исключение не выбрасывается.
      */
     @Test
-    void deleteAuthorByIdOkTest() throws Exception {
+    void deleteAuthorByIdOkTest() {
         when(authorDAO.deleteAuthorById(1L)).thenReturn(1);
 
         authorService.deleteAuthor(1L);
