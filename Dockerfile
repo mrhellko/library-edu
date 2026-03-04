@@ -2,7 +2,7 @@
 FROM eclipse-temurin:25-jdk AS build
 WORKDIR /workspace
 COPY . .
-RUN ./mvnw -DskipTests package
+RUN chmod +x mvnw && ./mvnw -DskipTests package
 
 # run stage
 FROM eclipse-temurin:25-jre
