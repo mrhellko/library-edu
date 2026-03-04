@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.mrhellko.library.Entity.Author;
 import ru.mrhellko.library.Entity.Book;
+import ru.mrhellko.library.Entity.Genre;
 import ru.mrhellko.library.assembler.BookAssembler;
 import ru.mrhellko.library.dto.BookWithAverageRatingDTO;
 import ru.mrhellko.library.exception.NotFoundException;
@@ -61,6 +62,9 @@ class BookControllerTest {
         Author a1 = new Author(1L, "a1");
         Author a2 = new Author(2L, "a2");
         book.setAuthors(List.of(a1, a2));
+        Genre g1 = new Genre(1L, "g1");
+        Genre g2 = new Genre(2L, "g2");
+        book.setGenres(List.of(g1, g2));
 
         BookWithAverageRatingDTO dto = new BookWithAverageRatingDTO(book);
         dto.setAverageRating(7.0f);
@@ -75,6 +79,10 @@ class BookControllerTest {
                 .andExpect(jsonPath("$[0].authors[0].authorName").value("a1"))
                 .andExpect(jsonPath("$[0].authors[1].id").value(2))
                 .andExpect(jsonPath("$[0].authors[1].authorName").value("a2"))
+                .andExpect(jsonPath("$[0].genres[0].id").value(1))
+                .andExpect(jsonPath("$[0].genres[0].genreName").value("g1"))
+                .andExpect(jsonPath("$[0].genres[1].id").value(2))
+                .andExpect(jsonPath("$[0].genres[1].genreName").value("g2"))
                 .andExpect(jsonPath("$[0].averageRating").value(7.0));
     }
 
@@ -99,6 +107,8 @@ class BookControllerTest {
         book.setBookName("b");
         Author author = new Author(1L, "a");
         book.setAuthors(List.of(author));
+        Genre genre = new Genre(1L, "g");
+        book.setGenres(List.of(genre));
 
         BookWithAverageRatingDTO dto = new BookWithAverageRatingDTO(book);
         dto.setAverageRating(null);
@@ -110,7 +120,9 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.bookName").value("b"))
                 .andExpect(jsonPath("$.authors[0].id").value(1))
-                .andExpect(jsonPath("$.authors[0].authorName").value("a"));
+                .andExpect(jsonPath("$.authors[0].authorName").value("a"))
+                .andExpect(jsonPath("$.genres[0].id").value(1))
+                .andExpect(jsonPath("$.genres[0].genreName").value("g"));
     }
 
     /**
@@ -124,6 +136,8 @@ class BookControllerTest {
         request.setBookName("b");
         Author author = new Author(1L, "a");
         request.setAuthors(List.of(author));
+        Genre genre = new Genre(1L, "g");
+        request.setGenres(List.of(genre));
 
         mockMvc.perform(put("/books/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -132,7 +146,7 @@ class BookControllerTest {
     }
 
     /**
-     * Если авторы в книге не найдены или отсутствуют, то эндпоинт PUT /books/{id} возвращает 400 Bad Request.
+     * Если авторы/жанры в книге не найдены или отсутствуют, то эндпоинт PUT /books/{id} возвращает 400 Bad Request.
      */
     @Test
     void updateBookNotFoundAuthorsTest() throws Exception {
@@ -142,6 +156,8 @@ class BookControllerTest {
         request.setBookName("b");
         Author author = new Author(1L, "a");
         request.setAuthors(List.of(author));
+        Genre genre = new Genre(1L, "g");
+        request.setGenres(List.of(genre));
 
         mockMvc.perform(put("/books/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -159,12 +175,15 @@ class BookControllerTest {
         updated.setBookName("b");
         Author author = new Author(1L, "a");
         updated.setAuthors(List.of(author));
+        Genre genre = new Genre(1L, "g");
+        updated.setGenres(List.of(genre));
 
         when(bookAssembler.updateBook(any(Book.class), eq(1L))).thenReturn(updated);
 
         Book request = new Book();
         request.setBookName("b");
         request.setAuthors(List.of(author));
+        request.setGenres(List.of(genre));
 
         mockMvc.perform(put("/books/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -173,7 +192,9 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.bookName").value("b"))
                 .andExpect(jsonPath("$.authors[0].id").value(1))
-                .andExpect(jsonPath("$.authors[0].authorName").value("a"));
+                .andExpect(jsonPath("$.authors[0].authorName").value("a"))
+                .andExpect(jsonPath("$.genres[0].id").value(1))
+                .andExpect(jsonPath("$.genres[0].genreName").value("g"));
     }
 
     /**
@@ -187,6 +208,8 @@ class BookControllerTest {
         request.setBookName("b");
         Author author = new Author(1L, "a");
         request.setAuthors(List.of(author));
+        Genre genre = new Genre(1L, "g");
+        request.setGenres(List.of(genre));
 
         mockMvc.perform(post("/books/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -205,6 +228,8 @@ class BookControllerTest {
         request.setBookName("b");
         Author author = new Author(1L, "a");
         request.setAuthors(List.of(author));
+        Genre genre = new Genre(1L, "g");
+        request.setGenres(List.of(genre));
 
         mockMvc.perform(post("/books/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -222,12 +247,15 @@ class BookControllerTest {
         saved.setBookName("b");
         Author author = new Author(1L, "a");
         saved.setAuthors(List.of(author));
+        Genre genre = new Genre(1L, "g");
+        saved.setGenres(List.of(genre));
 
         when(bookAssembler.saveBook(any(Book.class))).thenReturn(saved);
 
         Book request = new Book();
         request.setBookName("b");
         request.setAuthors(List.of(author));
+        request.setGenres(List.of(genre));
 
         mockMvc.perform(post("/books/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -236,7 +264,9 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.id").value(10))
                 .andExpect(jsonPath("$.bookName").value("b"))
                 .andExpect(jsonPath("$.authors[0].id").value(1))
-                .andExpect(jsonPath("$.authors[0].authorName").value("a"));
+                .andExpect(jsonPath("$.authors[0].authorName").value("a"))
+                .andExpect(jsonPath("$.genres[0].id").value(1))
+                .andExpect(jsonPath("$.genres[0].genreName").value("g"));
     }
 
     /**
@@ -293,6 +323,8 @@ class BookControllerTest {
         book.setBookName("b");
         Author author = new Author(1L, "a");
         book.setAuthors(List.of(author));
+        Genre genre = new Genre(1L, "g");
+        book.setGenres(List.of(genre));
 
         BookWithAverageRatingDTO dto = new BookWithAverageRatingDTO(book);
         dto.setAverageRating(null);
@@ -304,7 +336,9 @@ class BookControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].bookName").value("b"))
                 .andExpect(jsonPath("$[0].authors[0].id").value(1))
-                .andExpect(jsonPath("$[0].authors[0].authorName").value("a"));
+                .andExpect(jsonPath("$[0].authors[0].authorName").value("a"))
+                .andExpect(jsonPath("$[0].genres[0].id").value(1))
+                .andExpect(jsonPath("$[0].genres[0].genreName").value("g"));
     }
 
     /**
@@ -328,17 +362,60 @@ class BookControllerTest {
         book.setBookName("b");
         Author author = new Author(1L, "a");
         book.setAuthors(List.of(author));
+        Genre genre = new Genre(1L, "g");
+        book.setGenres(List.of(genre));
 
         BookWithAverageRatingDTO dto = new BookWithAverageRatingDTO(book);
         dto.setAverageRating(null);
 
         when(bookAssembler.getBooksByAuthorId(1L)).thenReturn(List.of(dto));
 
-        mockMvc.perform(get("/books/by-author/1").param("authorName", "a"))
+        mockMvc.perform(get("/books/by-author/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].bookName").value("b"))
                 .andExpect(jsonPath("$[0].authors[0].id").value(1))
-                .andExpect(jsonPath("$[0].authors[0].authorName").value("a"));
+                .andExpect(jsonPath("$[0].authors[0].authorName").value("a"))
+                .andExpect(jsonPath("$[0].genres[0].id").value(1))
+                .andExpect(jsonPath("$[0].genres[0].genreName").value("g"));
+    }
+
+    /**
+     * Если по genreId книги не найдены, то эндпоинт GET /books/genre/{genreId} возвращает 204 No Content.
+     */
+    @Test
+    void getBooksByGenreIdNoContentTest() throws Exception {
+        when(bookAssembler.getBooksByGenreId(1L)).thenReturn(List.of());
+
+        mockMvc.perform(get("/books/genre/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    /**
+     * Если по genreId книги найдены, то эндпоинт GET /books/genre/{genreId} возвращает 200 OK и JSON со списком.
+     */
+    @Test
+    void getBooksByGenreIdOkTest() throws Exception {
+        Book book = new Book();
+        book.setId(1L);
+        book.setBookName("b");
+        Author author = new Author(1L, "a");
+        book.setAuthors(List.of(author));
+        Genre genre = new Genre(1L, "g");
+        book.setGenres(List.of(genre));
+
+        BookWithAverageRatingDTO dto = new BookWithAverageRatingDTO(book);
+        dto.setAverageRating(null);
+
+        when(bookAssembler.getBooksByGenreId(1L)).thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/books/genre/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].bookName").value("b"))
+                .andExpect(jsonPath("$[0].authors[0].id").value(1))
+                .andExpect(jsonPath("$[0].authors[0].authorName").value("a"))
+                .andExpect(jsonPath("$[0].genres[0].id").value(1))
+                .andExpect(jsonPath("$[0].genres[0].genreName").value("g"));
     }
 }

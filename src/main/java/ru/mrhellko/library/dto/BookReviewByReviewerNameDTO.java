@@ -11,4 +11,5 @@ public class BookReviewByReviewerNameDTO {
     private Byte rating;
     private String bookName;
     private List<String> authorNames = new ArrayList<>();
+    private List<String> genreNames = new ArrayList<>();
 }

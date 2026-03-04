@@ -84,6 +84,39 @@ public class BookDAOTest {
     }
 
     /**
+     * Если книга по id жанра не нашлась, то возвращается пустой список
+     */
+    @Test
+    void getBooksByGenreIdNotFoundTest() {
+        List<Book> books = bookDAO.getBooksByGenreId(99999L);
+        assertThat(books).isEmpty();
+    }
+
+    /**
+     * По запросу 1 возвращает как минимум четыре книги
+     */
+    @Test
+    void getBooksByGenreIdFoundManyTest() {
+        List<Book> books = bookDAO.getBooksByGenreId(1L);
+        assertThat(books)
+                .map(Book::getBookName)
+                .contains("Гарри Поттер")
+                .contains("Игра престолов")
+                .contains("Бесконечная земля");
+    }
+
+    /**
+     * По запросу 2 возращает только те книги в которых жанр драма.
+     */
+    @Test
+    void getBooksByGenreIdFoundOneTest() {
+        List<Book> books = bookDAO.getBooksByGenreId(2L);
+        assertThat(books)
+                .map(Book::getBookName)
+                .allMatch(book -> book.equals("Гарри Поттер"));
+    }
+
+    /**
      * Если книга по id не найдена, то возвращается null.
      */
     @Test

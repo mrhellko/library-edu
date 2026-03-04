@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 public class BookReviewAssembler {
     @Autowired
-    BookReviewDAO bookReviewDAO;
+    private BookReviewDAO bookReviewDAO;
 
     public List<BookReviewByBookIdDTO> getReviewByBookId(Long bookId) {
         List<BookReview> bookReviews = bookReviewDAO.getReviewByBookId(bookId);

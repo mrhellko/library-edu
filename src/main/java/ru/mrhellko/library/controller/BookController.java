@@ -79,4 +79,14 @@ public class BookController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
+
+    @GetMapping("/genre/{genreId}")
+    public ResponseEntity<List<BookWithAverageRatingDTO>> getBooksByGenreId(@PathVariable Long genreId) {
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOs = bookAssembler.getBooksByGenreId(genreId);
+        if (!bookWithAverageRatingDTOs.isEmpty()) {
+            return new ResponseEntity<>(bookWithAverageRatingDTOs, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+    }
 }
