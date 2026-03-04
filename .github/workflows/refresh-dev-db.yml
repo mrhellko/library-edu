@@ -85,14 +85,17 @@ jobs:
           psql -d "$DEV_DB" -v ON_ERROR_STOP=1 -c "
             SET ROLE \"$DEV_OWNER\";
 
-            -- 1) allow DDL in schema
+            -- ensure DEV_OWNER owns schema public (otherwise next ALTER fails)
+            ALTER SCHEMA public OWNER TO \"$DEV_OWNER\";
+
+            -- now transfer schema ownership to app user (DDL allowed)
             ALTER SCHEMA public OWNER TO \"$DEV_APP_USER\";
             GRANT USAGE, CREATE ON SCHEMA public TO \"$DEV_APP_USER\";
 
-            -- 2) transfer ownership of all objects created by restore
+            -- transfer ownership of all objects created by restore
             REASSIGN OWNED BY \"$DEV_OWNER\" TO \"$DEV_APP_USER\";
 
-            -- 3) (optional) for visibility in IDE, explicit grants (usually not needed if owner)
+            -- optional explicit grants (usually not needed if owner)
             GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"$DEV_APP_USER\";
             GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \"$DEV_APP_USER\";
           "
