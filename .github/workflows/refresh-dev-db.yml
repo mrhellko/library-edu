@@ -76,7 +76,6 @@ jobs:
           # передаём владение и права приложению
           psql -d "$DEV_DB" -v ON_ERROR_STOP=1 -c "
             -- public schema должен принадлежать app user
-            ALTER SCHEMA public OWNER TO \"$DEV_APP_USER\";
             GRANT USAGE, CREATE ON SCHEMA public TO \"$DEV_APP_USER\";
 
             -- передаём ownership всех объектов, которые принадлежат refresh user
