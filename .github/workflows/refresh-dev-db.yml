@@ -80,9 +80,6 @@ jobs:
 
             -- передаём ownership всех объектов, которые принадлежат refresh user
             REASSIGN OWNED BY \"$PGUSER\" TO \"$DEV_APP_USER\";
-
-            -- комфортный search_path
-            ALTER ROLE \"$DEV_APP_USER\" IN DATABASE \"$DEV_DB\" SET search_path = public;
           "
 
       - name: Cleanup
