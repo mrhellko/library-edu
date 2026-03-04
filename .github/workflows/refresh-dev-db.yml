@@ -80,18 +80,21 @@ jobs:
             --clean --if-exists \
             /tmp/prod.dump
 
-          # IMPORTANT: grant as DEV_OWNER (owner of objects)
+          # IMPORTANT: make app user owner in dev (DDL allowed)
+          # run as DEV_OWNER (must own the objects)
           psql -d "$DEV_DB" -v ON_ERROR_STOP=1 -c "
             SET ROLE \"$DEV_OWNER\";
 
-            GRANT USAGE ON SCHEMA public TO \"$DEV_APP_USER\";
-            GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"$DEV_APP_USER\";
-            GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO \"$DEV_APP_USER\";
+            -- 1) allow DDL in schema
+            ALTER SCHEMA public OWNER TO \"$DEV_APP_USER\";
+            GRANT USAGE, CREATE ON SCHEMA public TO \"$DEV_APP_USER\";
 
-            ALTER DEFAULT PRIVILEGES IN SCHEMA public
-              GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO \"$DEV_APP_USER\";
-            ALTER DEFAULT PRIVILEGES IN SCHEMA public
-              GRANT USAGE, SELECT ON SEQUENCES TO \"$DEV_APP_USER\";
+            -- 2) transfer ownership of all objects created by restore
+            REASSIGN OWNED BY \"$DEV_OWNER\" TO \"$DEV_APP_USER\";
+
+            -- 3) (optional) for visibility in IDE, explicit grants (usually not needed if owner)
+            GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"$DEV_APP_USER\";
+            GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \"$DEV_APP_USER\";
           "
 
       - name: Cleanup
