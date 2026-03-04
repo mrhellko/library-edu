@@ -11,13 +11,22 @@ GET http://localhost:8080/reviews/book/1
 GET http://localhost:8080/reviews?reviewerName=Sergei
 
 ### Обновить книгу по id (id указан после /)
-PUT http://localhost:8080/books/1
+PUT http://localhost:8080/books/4
 Content-Type: application/json
 
 {
-  "id": 1,
-  "bookName": "Битва королей",
-  "author": "Джордж Мартин"
+  "id": 4,
+  "bookName": "Бесконечная земля",
+  "authors": [
+    {
+      "id": 4,
+      "authorName": "Терри Пратчетт"
+    },
+    {
+      "id": 6,
+      "authorName": "Стивен Бакстер"
+    }
+  ]
 }
 
 ### Создать новую книгу
@@ -26,8 +35,17 @@ Content-Type: application/json
 
 {
   "id": 64,
-  "bookName": "Буря мечей",
-  "author": "Джордж Мартин"
+  "bookName": "Одноэтажная Америка",
+  "authors": [
+    {
+      "id": 7,
+      "authorName": "Илья Ильф"
+    },
+    {
+      "id": 8,
+      "authorName": "Евгений Петров"
+    }
+  ]
 }
 
 ### Удалить книгу по id (id указан после /)
@@ -61,4 +79,31 @@ Content-Type: application/json
 DELETE http://localhost:8080/reviews/3
 
 ### Получить список всех книг от автора (автор указан после ?authorName=)
-GET http://localhost:8080/books?authorName=row
+GET http://localhost:8080/books?authorName=pra
+
+### Получить книги по id автора (id указан после /by-author/)
+GET http://localhost:8080/books/by-author/4
+
+### Получить автора по id (id указан после /)
+GET http://localhost:8080/authors/2
+
+### Обновить автора по id (id указан после /)
+PUT http://localhost:8080/authors/4
+Content-Type: application/json
+
+{
+  "id": 4,
+  "authorName": "Terry Pratchett"
+}
+
+### Создать нового автора
+POST http://localhost:8080/authors/
+Content-Type: application/json
+
+{
+  "id": 5342,
+  "authorName": "Leo Tolstoy"
+}
+
+### Удалить автора по id (id указан после /)
+DELETE http://localhost:8080/authors/2

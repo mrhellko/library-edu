@@ -80,7 +80,7 @@ public class BookReviewDAOTest {
                 .allMatch(r -> r.getReviewText() != null)
                 .allMatch(r -> r.getRating() != null)
                 .allMatch(r -> r.getBookName() != null)
-                .allMatch(r -> r.getAuthorName() != null);
+                .allMatch(r -> !r.getAuthorNames().isEmpty());
     }
 
     /**
@@ -110,7 +110,7 @@ public class BookReviewDAOTest {
      * Сохранение нового отзыва присваивает id и позволяет прочитать отзыв из базы данных.
      */
     @Test
-    void saveBookReviewTest() throws Exception {
+    void saveBookReviewTest() {
         BookReview newReview = new BookReview();
         newReview.setBookId(1L);
         newReview.setRating((byte) 9);
@@ -132,7 +132,7 @@ public class BookReviewDAOTest {
      * Удаление существующего отзыва возвращает 1 и отзыв перестаёт находиться по id.
      */
     @Test
-    void deleteBookReviewByIdTest() throws Exception {
+    void deleteBookReviewByIdTest() {
         BookReview newReview = new BookReview();
         newReview.setBookId(1L);
         newReview.setRating((byte) 5);
@@ -150,7 +150,7 @@ public class BookReviewDAOTest {
      * Удаление несуществующего отзыва возвращает 0.
      */
     @Test
-    void deleteBookReviewByIdNotFoundTest() throws Exception {
+    void deleteBookReviewByIdNotFoundTest() {
         int deleted = bookReviewDAO.deleteBookReviewById(99999L);
         assertThat(deleted).isEqualTo(0);
     }

@@ -47,14 +47,15 @@ public class BookReviewAssembler {
         }
     }
 
-    public BookReview saveBookReview(BookReview bookReview) throws Exception {
+    public BookReview saveBookReview(BookReview bookReview) {
         return bookReviewDAO.saveBookReview(bookReview);
     }
 
-    public void deleteBookReviewById(Long id) throws Exception {
+    public void deleteBookReviewById(Long id) {
         int result = bookReviewDAO.deleteBookReviewById(id);
         if (result == 0) {
             throw new NotFoundException(id);
         }
     }
+
 }

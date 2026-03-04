@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import ru.mrhellko.library.Entity.Author;
 import ru.mrhellko.library.Entity.Book;
 import ru.mrhellko.library.assembler.BookAssembler;
 import ru.mrhellko.library.dto.BookWithAverageRatingDTO;
@@ -57,7 +58,9 @@ class BookControllerTest {
         Book book = new Book();
         book.setId(1L);
         book.setBookName("b");
-        book.setAuthor("a");
+        Author a1 = new Author(1L, "a1");
+        Author a2 = new Author(2L, "a2");
+        book.setAuthors(List.of(a1, a2));
 
         BookWithAverageRatingDTO dto = new BookWithAverageRatingDTO(book);
         dto.setAverageRating(7.0f);
@@ -68,7 +71,10 @@ class BookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].bookName").value("b"))
-                .andExpect(jsonPath("$[0].author").value("a"))
+                .andExpect(jsonPath("$[0].authors[0].id").value(1))
+                .andExpect(jsonPath("$[0].authors[0].authorName").value("a1"))
+                .andExpect(jsonPath("$[0].authors[1].id").value(2))
+                .andExpect(jsonPath("$[0].authors[1].authorName").value("a2"))
                 .andExpect(jsonPath("$[0].averageRating").value(7.0));
     }
 
@@ -91,7 +97,8 @@ class BookControllerTest {
         Book book = new Book();
         book.setId(1L);
         book.setBookName("b");
-        book.setAuthor("a");
+        Author author = new Author(1L, "a");
+        book.setAuthors(List.of(author));
 
         BookWithAverageRatingDTO dto = new BookWithAverageRatingDTO(book);
         dto.setAverageRating(null);
@@ -102,7 +109,8 @@ class BookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.bookName").value("b"))
-                .andExpect(jsonPath("$.author").value("a"));
+                .andExpect(jsonPath("$.authors[0].id").value(1))
+                .andExpect(jsonPath("$.authors[0].authorName").value("a"));
     }
 
     /**
@@ -114,12 +122,31 @@ class BookControllerTest {
 
         Book request = new Book();
         request.setBookName("b");
-        request.setAuthor("a");
+        Author author = new Author(1L, "a");
+        request.setAuthors(List.of(author));
 
         mockMvc.perform(put("/books/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
+    }
+
+    /**
+     * Если авторы в книге не найдены или отсутствуют, то эндпоинт PUT /books/{id} возвращает 400 Bad Request.
+     */
+    @Test
+    void updateBookNotFoundAuthorsTest() throws Exception {
+        when(bookAssembler.updateBook(any(Book.class), eq(1L))).thenThrow(new IllegalArgumentException("no authors"));
+
+        Book request = new Book();
+        request.setBookName("b");
+        Author author = new Author(1L, "a");
+        request.setAuthors(List.of(author));
+
+        mockMvc.perform(put("/books/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 
     /**
@@ -130,13 +157,14 @@ class BookControllerTest {
         Book updated = new Book();
         updated.setId(1L);
         updated.setBookName("b");
-        updated.setAuthor("a");
+        Author author = new Author(1L, "a");
+        updated.setAuthors(List.of(author));
 
         when(bookAssembler.updateBook(any(Book.class), eq(1L))).thenReturn(updated);
 
         Book request = new Book();
         request.setBookName("b");
-        request.setAuthor("a");
+        request.setAuthors(List.of(author));
 
         mockMvc.perform(put("/books/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -144,11 +172,30 @@ class BookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.bookName").value("b"))
-                .andExpect(jsonPath("$.author").value("a"));
+                .andExpect(jsonPath("$.authors[0].id").value(1))
+                .andExpect(jsonPath("$.authors[0].authorName").value("a"));
     }
 
     /**
-     * Если при сохранении книги возникает ошибка, то эндпоинт POST /books/ возвращает 500 Internal Server Error.
+     * Если при сохранении книги возникает IllegalArgumentException ошибка, то эндпоинт POST /books/ возвращает 400 Bad Request.
+     */
+    @Test
+    void saveBookBadRequestErrorTest() throws Exception {
+        when(bookAssembler.saveBook(any(Book.class))).thenThrow(new IllegalArgumentException("no authors"));
+
+        Book request = new Book();
+        request.setBookName("b");
+        Author author = new Author(1L, "a");
+        request.setAuthors(List.of(author));
+
+        mockMvc.perform(post("/books/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    /**
+     * Если при сохранении книги возникает иная ошибка, то эндпоинт POST /books/ возвращает 500 Internal Server Error.
      */
     @Test
     void saveBookInternalServerErrorTest() throws Exception {
@@ -156,7 +203,8 @@ class BookControllerTest {
 
         Book request = new Book();
         request.setBookName("b");
-        request.setAuthor("a");
+        Author author = new Author(1L, "a");
+        request.setAuthors(List.of(author));
 
         mockMvc.perform(post("/books/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -172,13 +220,14 @@ class BookControllerTest {
         Book saved = new Book();
         saved.setId(10L);
         saved.setBookName("b");
-        saved.setAuthor("a");
+        Author author = new Author(1L, "a");
+        saved.setAuthors(List.of(author));
 
         when(bookAssembler.saveBook(any(Book.class))).thenReturn(saved);
 
         Book request = new Book();
         request.setBookName("b");
-        request.setAuthor("a");
+        request.setAuthors(List.of(author));
 
         mockMvc.perform(post("/books/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -186,7 +235,8 @@ class BookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(10))
                 .andExpect(jsonPath("$.bookName").value("b"))
-                .andExpect(jsonPath("$.author").value("a"));
+                .andExpect(jsonPath("$.authors[0].id").value(1))
+                .andExpect(jsonPath("$.authors[0].authorName").value("a"));
     }
 
     /**
@@ -241,7 +291,8 @@ class BookControllerTest {
         Book book = new Book();
         book.setId(1L);
         book.setBookName("b");
-        book.setAuthor("a");
+        Author author = new Author(1L, "a");
+        book.setAuthors(List.of(author));
 
         BookWithAverageRatingDTO dto = new BookWithAverageRatingDTO(book);
         dto.setAverageRating(null);
@@ -252,6 +303,42 @@ class BookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].bookName").value("b"))
-                .andExpect(jsonPath("$[0].author").value("a"));
+                .andExpect(jsonPath("$[0].authors[0].id").value(1))
+                .andExpect(jsonPath("$[0].authors[0].authorName").value("a"));
+    }
+
+    /**
+     * Если по authorId книги не найдены, то эндпоинт GET /books/by-author/{authorId} возвращает 204 No Content.
+     */
+    @Test
+    void getBooksByAuthorIdNoContentTest() throws Exception {
+        when(bookAssembler.getBooksByAuthorId(1L)).thenReturn(List.of());
+
+        mockMvc.perform(get("/books/by-author/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    /**
+     * Если по authorId книги найдены, то эндпоинт GET /books/by-author/{authorId} возвращает 200 OK и JSON со списком.
+     */
+    @Test
+    void getBooksByAuthorIdOkTest() throws Exception {
+        Book book = new Book();
+        book.setId(1L);
+        book.setBookName("b");
+        Author author = new Author(1L, "a");
+        book.setAuthors(List.of(author));
+
+        BookWithAverageRatingDTO dto = new BookWithAverageRatingDTO(book);
+        dto.setAverageRating(null);
+
+        when(bookAssembler.getBooksByAuthorId(1L)).thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/books/by-author/1").param("authorName", "a"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].bookName").value("b"))
+                .andExpect(jsonPath("$[0].authors[0].id").value(1))
+                .andExpect(jsonPath("$[0].authors[0].authorName").value("a"));
     }
 }

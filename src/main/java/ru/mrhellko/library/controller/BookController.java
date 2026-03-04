@@ -34,7 +34,7 @@ public class BookController {
         if (bookWithAverageRatingDTO != null) {
             return new ResponseEntity<>(bookWithAverageRatingDTO, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NotFoundException(id);
         }
     }
 
@@ -44,35 +44,35 @@ public class BookController {
         if (updatedBook != null) {
             return new ResponseEntity<>(updatedBook, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NotFoundException(id);
         }
     }
 
     @PostMapping("/")
     public ResponseEntity<Book> saveBook(@RequestBody Book book) {
-        try {
-            Book savedBook = bookAssembler.saveBook(book);
-            return new ResponseEntity<>(savedBook, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Book savedBook = bookAssembler.saveBook(book);
+        return new ResponseEntity<>(savedBook, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBookById(@PathVariable Long id) {
-        try {
-            bookAssembler.deleteBook(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        bookAssembler.deleteBook(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping
     public ResponseEntity<List<BookWithAverageRatingDTO>> getBooksByAuthorName(@RequestParam(value = "authorName") String authorName) {
         List<BookWithAverageRatingDTO> bookWithAverageRatingDTOs = bookAssembler.getBooksByAuthorName(authorName);
+        if (!bookWithAverageRatingDTOs.isEmpty()) {
+            return new ResponseEntity<>(bookWithAverageRatingDTOs, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+    }
+
+    @GetMapping("/by-author/{authorId}")
+    public ResponseEntity<List<BookWithAverageRatingDTO>> getBooksByAuthorId(@PathVariable Long authorId) {
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOs = bookAssembler.getBooksByAuthorId(authorId);
         if (!bookWithAverageRatingDTOs.isEmpty()) {
             return new ResponseEntity<>(bookWithAverageRatingDTOs, HttpStatus.OK);
         } else {
