@@ -1,6 +1,8 @@
 --liquibase formatted sql
+
 --changeset EA:3
 CREATE SEQUENCE book_reviews_seq START WITH 1 INCREMENT BY 1;
+
 --changeset EA:1
 CREATE TABLE book_reviews
 (
@@ -15,11 +17,3 @@ CREATE TABLE book_reviews
 );
 --changeset EA:4
 CREATE INDEX idx_book_reviews_book_id ON book_reviews (book_id);
-
---changeset EA:2
-INSERT INTO book_reviews (id, book_id, rating, reviewer_name, review_text)
-VALUES (nextval('book_reviews_seq'), 1, 8, 'Anna', 'Книга детства! Рекомендую!');
-INSERT INTO book_reviews (id, book_id, rating, reviewer_name, review_text)
-VALUES (nextval('book_reviews_seq'), 2, 7, 'Sergei', 'Не знаю о чем она, я все забыл.');
-INSERT INTO book_reviews (id, book_id, rating, reviewer_name, review_text)
-VALUES (nextval('book_reviews_seq'), 1, 3, 'Sergei', 'Скука, для детей.');

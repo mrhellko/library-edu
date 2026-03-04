@@ -10,13 +10,6 @@ CREATE TABLE authors
     author_name text
 );
 
---changeset EA:3
-INSERT INTO authors (id, author_name)
-SELECT nextval('authors_seq'),
-       distinct_names.author_name
-FROM (SELECT DISTINCT author_name
-      FROM books) AS distinct_names;
-
 --changeset EA:4
 --Промежуточная таблица для связи многие-ко-многим
 CREATE TABLE book_authors
@@ -34,13 +27,6 @@ CREATE TABLE book_authors
         FOREIGN KEY (author_id) REFERENCES authors (id) ON DELETE CASCADE
 );
 
---changeset EA:5
-INSERT INTO book_authors (book_id, author_id)
-SELECT books.id,
-       authors.id
-FROM books
-         JOIN authors ON books.author_name = authors.author_name;
-
 --changeset EA:6
 ALTER TABLE books
 DROP
@@ -49,66 +35,3 @@ COLUMN author_name;
 --changeset EA:7
 CREATE INDEX idx_book_authors_book_id ON book_authors (book_id);
 CREATE INDEX idx_book_authors_author_id ON book_authors (author_id);
-
---changeset EA:8
-INSERT INTO books (id, book_name)
-VALUES (nextval('books_seq'), 'Благие знамения');
-INSERT INTO authors (id, author_name)
-VALUES (nextval('authors_seq'), 'Терри Пратчетт');
-INSERT INTO authors (id, author_name)
-VALUES (nextval('authors_seq'), 'Нил Гейман');
-
-INSERT INTO book_authors (book_id, author_id)
-SELECT b.id, a.id
-FROM books b
-         JOIN authors a on a.author_name = 'Терри Пратчетт'
-where b.book_name = 'Благие знамения'
-;
-INSERT INTO book_authors (book_id, author_id)
-SELECT b.id, a.id
-FROM books b
-         JOIN authors a on a.author_name = 'Нил Гейман'
-where b.book_name = 'Благие знамения'
-;
---changeset EA:9
-INSERT INTO books (id, book_name)
-VALUES (nextval('books_seq'), 'Бесконечная земля');
-INSERT INTO authors (id, author_name)
-VALUES (nextval('authors_seq'), 'Стивен Бакстер');
-
-INSERT INTO book_authors (book_id, author_id)
-SELECT b.id, a.id
-FROM books b
-         JOIN authors a on a.author_name = 'Терри Пратчетт'
-where b.book_name = 'Бесконечная земля'
-;
-INSERT INTO book_authors (book_id, author_id)
-SELECT b.id, a.id
-FROM books b
-         JOIN authors a on a.author_name = 'Стивен Бакстер'
-where b.book_name = 'Бесконечная земля'
-;
---changeset EA:10
-INSERT INTO books (id, book_name)
-VALUES (nextval('books_seq'), 'Одноэтажная Америка');
-INSERT INTO authors (id, author_name)
-VALUES (nextval('authors_seq'), 'Илья Ильф');
-INSERT INTO authors (id, author_name)
-VALUES (nextval('authors_seq'), 'Евгений Петров');
-
-INSERT INTO book_authors (book_id, author_id)
-SELECT b.id, a.id
-FROM books b
-         JOIN authors a on a.author_name = 'Илья Ильф'
-where b.book_name = 'Одноэтажная Америка'
-;
-INSERT INTO book_authors (book_id, author_id)
-SELECT b.id, a.id
-FROM books b
-         JOIN authors a on a.author_name = 'Евгений Петров'
-where b.book_name = 'Одноэтажная Америка'
-;
-
---changeset EA:11
-INSERT INTO book_reviews (id, book_id, rating, reviewer_name, review_text)
-VALUES (nextval('book_reviews_seq'), 4, 10, 'Fiona', 'Перечитываю каждый месяц!');
