@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: library
+
+  datasource:
+    url: jdbc:h2:mem:library;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+
+  #  jpa:
+  #    generate-ddl: false
+  #    hibernate:
+  #      ddl-auto: none
+
+  liquibase:
+    change-log: classpath:/db/changelog-master.yaml
+
+logging:
+  level:
+    org.springframework.jdbc.core: DEBUG
+
