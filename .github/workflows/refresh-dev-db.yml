@@ -69,7 +69,7 @@ jobs:
 
           # drop & create dev with fixed owner
           dropdb --if-exists "$DEV_DB"
-          createdb --owner="$DEV_OWNER" "$DEV_DB"
+          createdb --template=template0 --owner="$DEV_OWNER" "$DEV_DB"
 
           # restore:
           # - do NOT import owners/privileges from prod
