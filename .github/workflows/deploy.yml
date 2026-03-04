@@ -2,7 +2,7 @@ name: Deploy to VPS (stable /opt)
 
 on:
   push:
-    branches: [ "autodeploy" ]
+    branches: [ "master" ]
   workflow_dispatch:
 
 concurrency:
