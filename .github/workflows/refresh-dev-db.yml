@@ -69,7 +69,11 @@ jobs:
 
           # drop & create dev with fixed owner
           dropdb --if-exists "$DEV_DB"
-          createdb --template=template0 --owner="$DEV_OWNER" "$DEV_DB"
+          createdb --owner="$DEV_OWNER" "$DEV_DB"
+
+          sudo -u postgres psql -d "$DEV_DB" -v ON_ERROR_STOP=1 -c "
+          ALTER SCHEMA public OWNER TO \"$DEV_OWNER\";
+          "
 
           # restore:
           # - do NOT import owners/privileges from prod
