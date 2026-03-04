@@ -48,60 +48,42 @@ jobs:
           rm -f /tmp/prod.dump
           pg_dump -Fc -d "$PROD_DB" --no-owner --no-privileges -f /tmp/prod.dump
 
-      - name: Recreate dev DB and restore as egrishkova (then grant app_dev_user)
+      - name: Recreate dev DB and restore (public owned by app_dev_user)
         env:
           PGHOST: 127.0.0.1
           PGPORT: "5432"
-          PGUSER: ${{ secrets.PGUSER_REFRESH }}
+          PGUSER: ${{ secrets.PGUSER_REFRESH }}         # gha_refresh_user
           PGPASSWORD: ${{ secrets.PGPASSWORD_REFRESH }}
           DEV_DB: library_dev
-          DEV_OWNER: egrishkova
           DEV_APP_USER: app_dev_user
         run: |
           set -euo pipefail
 
-          # terminate connections to dev
           psql -d postgres -v ON_ERROR_STOP=1 -c "
             SELECT pg_terminate_backend(pid)
             FROM pg_stat_activity
             WHERE datname = '$DEV_DB' AND pid <> pg_backend_pid();
           "
 
-          # drop & create dev with fixed owner
           dropdb --if-exists "$DEV_DB"
-          createdb --owner="$DEV_OWNER" "$DEV_DB"
+          createdb --owner="$PGUSER" "$DEV_DB"
 
-          sudo -u postgres psql -d "$DEV_DB" -v ON_ERROR_STOP=1 -c "
-          ALTER SCHEMA public OWNER TO \"$DEV_OWNER\";
-          "
-
-          # restore:
-          # - do NOT import owners/privileges from prod
-          # - but CREATE objects under DEV_OWNER via SET ROLE (requires: GRANT egrishkova TO gha_refresh_user)
           pg_restore -d "$DEV_DB" \
-            --role="$DEV_OWNER" \
             --no-owner --no-privileges \
             --clean --if-exists \
             /tmp/prod.dump
 
-          # IMPORTANT: make app user owner in dev (DDL allowed)
-          # run as DEV_OWNER (must own the objects)
+          # передаём владение и права приложению
           psql -d "$DEV_DB" -v ON_ERROR_STOP=1 -c "
-            SET ROLE \"$DEV_OWNER\";
-
-            -- ensure DEV_OWNER owns schema public (otherwise next ALTER fails)
-            ALTER SCHEMA public OWNER TO \"$DEV_OWNER\";
-
-            -- now transfer schema ownership to app user (DDL allowed)
+            -- public schema должен принадлежать app user
             ALTER SCHEMA public OWNER TO \"$DEV_APP_USER\";
             GRANT USAGE, CREATE ON SCHEMA public TO \"$DEV_APP_USER\";
 
-            -- transfer ownership of all objects created by restore
-            REASSIGN OWNED BY \"$DEV_OWNER\" TO \"$DEV_APP_USER\";
+            -- передаём ownership всех объектов, которые принадлежат refresh user
+            REASSIGN OWNED BY \"$PGUSER\" TO \"$DEV_APP_USER\";
 
-            -- optional explicit grants (usually not needed if owner)
-            GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"$DEV_APP_USER\";
-            GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \"$DEV_APP_USER\";
+            -- комфортный search_path
+            ALTER ROLE \"$DEV_APP_USER\" IN DATABASE \"$DEV_DB\" SET search_path = public;
           "
 
       - name: Cleanup
