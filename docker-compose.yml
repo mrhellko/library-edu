@@ -1,0 +1,20 @@
+services:
+  library:
+    build: .
+    container_name: library
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    # кладём конфиг в стандартное место Spring Boot: /config
+    volumes:
+      - /etc/library/application-prod.yml:/config/application-prod.yml:ro
+
+    environment:
+      SPRING_PROFILES_ACTIVE: "prod"
+      SPRING_CONFIG_IMPORT: "optional:file:/config/application-prod.yml"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
