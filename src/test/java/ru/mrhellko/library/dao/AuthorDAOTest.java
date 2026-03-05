@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-public class AuthorDAOTest {
+public class AuthorDAOTest extends AbstractDAOTest {
     @Autowired
     private AuthorDAO authorDAO;
 

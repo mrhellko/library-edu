@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-public class BookReviewDAOTest {
+public class BookReviewDAOTest extends AbstractDAOTest {
     @Autowired
     private BookReviewDAO bookReviewDAO;
 

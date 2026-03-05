@@ -1,0 +1,34 @@
+name: Deploy to VPS (stable /opt)
+
+on:
+  push:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync sources to /opt/library-edu
+        run: |
+          set -euo pipefail
+          mkdir -p /opt/library-edu
+          rsync -a --delete \
+            --exclude ".git" \
+            --exclude ".github" \
+            ./ /opt/library-edu/
+
+      - name: Build & restart via docker compose (from /opt)
+        run: |
+          set -euo pipefail
+          cd /opt/library-edu
+          docker compose --env-file /etc/library/library.env up -d --build
+          docker ps --filter "name=library"
