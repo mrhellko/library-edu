@@ -157,3 +157,30 @@ Content-Type: application/json
 
 ### Удалить жанр по id (id указан после /)
 DELETE http://localhost:8080/genres/8
+
+### Получить место хранения по id (id указан после /)
+GET http://localhost:8080/storage-locations/2
+
+### Обновить место хранения по id (id указан после /)
+PUT http://localhost:8080/storage-locations/2
+Content-Type: application/json
+
+{
+  "id": 2,
+  "authorName": "Terry Pratchett"
+}
+
+### Создать новое место хранения
+POST http://localhost:8080/storage-locations/
+Content-Type: application/json
+
+{
+  "id": 5342,
+  "authorName": "Leo Tolstoy"
+}
+
+### Удалить место хранения по id (id указан после /)
+DELETE http://localhost:8080/storage-locations/1
+
+### Получить отсортированный по quality список копий по bookId (bookId указан между /books/ и /copy)
+GET http://localhost:8080/books/1502/copy
