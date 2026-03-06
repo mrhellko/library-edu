@@ -31,6 +31,7 @@ public class BookDAOTest extends AbstractDAOTest {
     @Test
     void getBooksByAuthorNameFoundManyTest() {
         List<Book> books = bookDAO.getBooksByAuthorName("И");
+        assertThat(books).hasSize(5);
         assertThat(books)
                 .map(Book::getBookName)
                 .contains("Задача трех тел")

@@ -22,7 +22,7 @@ public class BookDAO {
     private static final String DELETE_BOOK_AUTHOR_SQL = "delete from book_authors where book_id = ? and author_id = ?";
     private static final String DELETE_BOOK_GENRE_SQL = "delete from book_genres where book_id = ? and genre_id = ?";
     private static final String GET_BOOKS_BY_AUTHOR_NAME_SQL = """
-            select b.id, b.book_name from books b
+            select distinct b.id, b.book_name from books b
                 left join book_authors ba on b.id = ba.book_id
                 join authors a on ba.author_id = a.id
                                      where a.author_name ilike '%' || ? || '%'""";
