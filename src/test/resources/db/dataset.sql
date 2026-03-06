@@ -91,3 +91,66 @@ where b.book_name = 'Одноэтажная Америка';
 
 INSERT INTO book_reviews (id, book_id, rating, reviewer_name, review_text)
 VALUES (nextval('book_reviews_seq'), (select id from books where book_name = 'Благие знамения'), 10, 'Fiona', 'Перечитываю каждый месяц!');
+
+INSERT INTO genres (id, genre_name)
+VALUES (nextval('genres_seq'), 'Фэнтези');
+INSERT INTO genres (id, genre_name)
+VALUES (nextval('genres_seq'), 'Драма');
+INSERT INTO genres (id, genre_name)
+VALUES (nextval('genres_seq'), 'Научная фантастика');
+INSERT INTO genres (id, genre_name)
+VALUES (nextval('genres_seq'), 'Средневековье');
+INSERT INTO genres (id, genre_name)
+VALUES (nextval('genres_seq'), 'Роман');
+INSERT INTO genres (id, genre_name)
+VALUES (nextval('genres_seq'), 'Юмор');
+
+--Добавление связей книг и жанров
+INSERT INTO book_genres (book_id, genre_id)
+SELECT b.id, g.id
+FROM books b
+         CROSS JOIN genres g
+where b.book_name = 'Гарри Поттер'
+  AND g.genre_name IN ('Фэнтези', 'Роман', 'Драма', 'Юмор');
+
+INSERT INTO book_genres (book_id, genre_id)
+SELECT b.id, g.id
+FROM books b
+         CROSS JOIN genres g
+where b.book_name = 'Задача трех тел'
+  AND g.genre_name IN ('Научная фантастика');
+
+INSERT INTO book_genres (book_id, genre_id)
+SELECT b.id, g.id
+FROM books b
+         CROSS JOIN genres g
+where b.book_name = 'Игра престолов'
+  AND g.genre_name IN ('Фэнтези', 'Роман', 'Средневековье');
+
+INSERT INTO book_genres (book_id, genre_id)
+SELECT b.id, g.id
+FROM books b
+         CROSS JOIN genres g
+where b.book_name = 'Буря мечей'
+  AND g.genre_name IN ('Фэнтези', 'Роман', 'Средневековье');
+
+INSERT INTO book_genres (book_id, genre_id)
+SELECT b.id, g.id
+FROM books b
+         CROSS JOIN genres g
+where b.book_name = 'Благие знамения'
+  AND g.genre_name IN ('Юмор');
+
+INSERT INTO book_genres (book_id, genre_id)
+SELECT b.id, g.id
+FROM books b
+         CROSS JOIN genres g
+where b.book_name = 'Бесконечная земля'
+  AND g.genre_name IN ('Научная фантастика', 'Роман', 'Фэнтези');
+
+INSERT INTO book_genres (book_id, genre_id)
+SELECT b.id, g.id
+FROM books b
+         CROSS JOIN genres g
+where b.book_name = 'Одноэтажная Америка'
+  AND g.genre_name IN ('Юмор');

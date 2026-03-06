@@ -12,4 +12,5 @@ public class Book {
 
     private String bookName;
     private List<Author> authors = new ArrayList<>();
+    private List<Genre> genres = new ArrayList<>();
 }
