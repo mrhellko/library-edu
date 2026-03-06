@@ -154,3 +154,23 @@ FROM books b
          CROSS JOIN genres g
 where b.book_name = 'Одноэтажная Америка'
   AND g.genre_name IN ('Юмор');
+
+INSERT INTO storage_locations (id, building, room, shelf)
+VALUES (nextval('storage_locations_seq'), 'ул. Пушкина, д. 32', 'Главный зал', '1');
+INSERT INTO storage_locations (id, building, room, shelf)
+VALUES (nextval('storage_locations_seq'), 'ул. Пушкина, д. 32', 'Главный зал', '2');
+INSERT INTO storage_locations (id, building, room, shelf)
+VALUES (nextval('storage_locations_seq'), 'ул. Великих писателей, д. 1', 'VIP-зал', '1');
+
+INSERT INTO copies(id, book_id, quality, status, storage_location_id)
+values ('f3', 1, 0, 0, 1);
+INSERT INTO copies(id, book_id, quality, status, storage_location_id)
+values ('d1', 2, 3, 1, 2);
+INSERT INTO copies(id, book_id, quality, status, storage_location_id)
+values ('FeI', 3, 2, 2, 1);
+INSERT INTO copies(id, book_id, quality, status, storage_location_id)
+values ('d2', 2, 1, 3, 2);
+INSERT INTO copies(id, book_id, quality, status, storage_location_id)
+values ('PO', 1, 0, 1, 1);
+INSERT INTO copies(id, book_id, quality, status, storage_location_id)
+values ('KFE', 4, 0, 3, 3);
