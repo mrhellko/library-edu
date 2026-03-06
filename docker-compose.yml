@@ -14,7 +14,7 @@ services:
       SPRING_PROFILES_ACTIVE: "prod"
       SPRING_CONFIG_IMPORT: "optional:file:/config/application-prod.yml"
       DB_PASSWORD: "${DB_PASSWORD}"
-      JAVA_OPTS: "-Xms256m -Xmx512m"
+      JAVA_OPTS: "-Xms64m -Xmx192m"
 
     extra_hosts:
       - "host.docker.internal:host-gateway"

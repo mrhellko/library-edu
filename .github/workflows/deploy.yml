@@ -26,6 +26,13 @@ jobs:
             --exclude ".github" \
             ./ /opt/library-edu/
 
+      - name: Build jar
+        run: |
+          set -euo pipefail
+          cd /opt/library-edu
+          chmod +x mvnw
+          ./mvnw -DskipTests package
+          
       - name: Build & restart via docker compose (from /opt)
         run: |
           set -euo pipefail
