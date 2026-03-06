@@ -417,4 +417,46 @@ class BookAssemblerTest {
         assertThat(dtos).hasSize(1);
         assertThat(dtos.getFirst().getId()).isEqualTo(1L);
     }
+
+    /**
+     * Поиск книг по avgRating без genreId возвращает DTOs и правильно вызывает bookDao.
+     */
+    @Test
+    void getBooksByAvgRatingNoGenreIdTest() {
+        BookWithAverageRatingDTO b = new BookWithAverageRatingDTO();
+        b.setId(1L);
+        b.setBookName("b");
+        b.setAuthors(List.of(new Author(1L, "a")));
+        b.setGenres(List.of(new Genre(1L, "g")));
+        b.setAverageRating(5.5F);
+
+        when(bookDAO.getBooksByAvgRating(4.0F)).thenReturn(List.of(b));
+
+        List<BookWithAverageRatingDTO> dtos = bookAssembler.getBooksByAvgRating(4.0F, null);
+        assertThat(dtos).hasSize(1);
+        assertThat(dtos.getFirst().getId()).isEqualTo(1L);
+
+        verify(bookDAO).getBooksByAvgRating(4.0F);
+    }
+
+    /**
+     * Поиск книг по avgRating и genreId возвращает DTOs и правильно вызывает bookDao.
+     */
+    @Test
+    void getBooksByAvgRatingWithGenreIdTest() {
+        BookWithAverageRatingDTO b = new BookWithAverageRatingDTO();
+        b.setId(1L);
+        b.setBookName("b");
+        b.setAuthors(List.of(new Author(1L, "a")));
+        b.setGenres(List.of(new Genre(1L, "g")));
+        b.setAverageRating(6.5F);
+
+        when(bookDAO.getBooksByAvgRating(3.0F, 4L)).thenReturn(List.of(b));
+
+        List<BookWithAverageRatingDTO> dtos = bookAssembler.getBooksByAvgRating(3.0F, 4L);
+        assertThat(dtos).hasSize(1);
+        assertThat(dtos.getFirst().getId()).isEqualTo(1L);
+
+        verify(bookDAO).getBooksByAvgRating(3.0F, 4L);
+    }
 }

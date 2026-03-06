@@ -140,6 +140,18 @@ public class BookAssembler {
         return fillListOfBookWithAverageRatingDTO(books);
     }
 
+    public List<BookWithAverageRatingDTO> getBooksByAvgRating(Float avgRating, Long genreId) {
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS;
+        if (genreId == null) {
+            bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(avgRating);
+        } else {
+            bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(avgRating, genreId);
+        }
+        fillBooksWithAuthors(bookWithAverageRatingDTOS);
+        fillBooksWithGenres(bookWithAverageRatingDTOS);
+        return bookWithAverageRatingDTOS;
+    }
+
     private @NonNull List<BookWithAverageRatingDTO> fillListOfBookWithAverageRatingDTO(List<Book> books) {
         List<BookWithAverageRatingDTO> bookWithAverageRatingDTOs = new ArrayList<>();
         for (Book book : books) {
@@ -159,7 +171,7 @@ public class BookAssembler {
         return bookReviews.isEmpty() ? null : (float) sum / bookReviews.size();
     }
 
-    private void fillBooksWithAuthors(List<Book> books) {
+    private void fillBooksWithAuthors(List<? extends Book> books) {
         Map<Long, Book> bookIndex = new HashMap<>();
         for (Book book : books) {
             bookIndex.put(book.getId(), book);
@@ -172,7 +184,7 @@ public class BookAssembler {
         }
     }
 
-    private void fillBooksWithGenres(List<Book> books) {
+    private void fillBooksWithGenres(List<? extends Book> books) {
         Map<Long, Book> bookIndex = new HashMap<>();
         for (Book book : books) {
             bookIndex.put(book.getId(), book);

@@ -74,6 +74,12 @@ GET http://localhost:8080/books/by-author/4
 ### Получить книги по id жанра (id указан после /genre/)
 GET http://localhost:8080/books/genre/1
 
+### Получить книги, у которых средний рейтинг строго больше avgRating (avgRating указан после /avg-rating/)
+GET http://localhost:8080/books/avg-rating/4.1
+
+### Получить книги, у которых средний рейтинг строго больше avgRating и жанр равен id (avgRating указан после /avg-rating/, genreId указан после ?genreId)
+GET http://localhost:8080/books/avg-rating/4.1?genreId=1
+
 ### Получить отзыв по id книги (id указан после /book/)
 GET http://localhost:8080/reviews/book/1
 

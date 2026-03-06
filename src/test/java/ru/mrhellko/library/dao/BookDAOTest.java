@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import ru.mrhellko.library.Entity.Book;
+import ru.mrhellko.library.dto.BookWithAverageRatingDTO;
 
 import java.util.List;
 
@@ -114,6 +115,70 @@ public class BookDAOTest extends AbstractDAOTest {
         assertThat(books)
                 .map(Book::getBookName)
                 .allMatch(book -> book.equals("Гарри Поттер"));
+    }
+
+    /**
+     * Если книга по заданному среднему рейтингу не нашлась, то возвращается пустой список
+     */
+    @Test
+    void getBooksByAvgRatingNoGenreIdNotFoundTest() {
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(11.0F);
+        assertThat(bookWithAverageRatingDTOS).isEmpty();
+    }
+
+    /**
+     * По запросу 6.9 возвращает минимум две книги
+     */
+    @Test
+    void getBooksByAvgRatingNoGenreIdFoundManyTest() {
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(6.9F);
+        assertThat(bookWithAverageRatingDTOS)
+                .map(Book::getBookName)
+                .contains("Задача трех тел")
+                .contains("Благие знамения");
+    }
+
+    /**
+     * По запросу 9.9 возвращает только одну книгу с рейтингом более 9.9
+     */
+    @Test
+    void getBooksByAvgRatingNoGenreIdFoundOneTest() {
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(9.9F);
+        assertThat(bookWithAverageRatingDTOS)
+                .map(Book::getBookName)
+                .allMatch(book -> book.equals("Благие знамения"));
+    }
+
+    /**
+     * Если книга по заданному среднему рейтингу и genreId не нашлась, то возвращается пустой список
+     */
+    @Test
+    void getBooksByAvgRatingWithGenreIdNotFoundTest() {
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(9.9F, 1L);
+        assertThat(bookWithAverageRatingDTOS).isEmpty();
+    }
+
+    /**
+     * По запросу 2.1 и 6 (Юмор) возвращает минимум две книги
+     */
+    @Test
+    void getBooksByAvgRatingWithGenreIdFoundManyTest() {
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(2.1F, 6L);
+        assertThat(bookWithAverageRatingDTOS)
+                .map(Book::getBookName)
+                .contains("Гарри Поттер")
+                .contains("Благие знамения");
+    }
+
+    /**
+     * По запросу 6.9 и 3 возвращает только одну книгу с рейтингом более 6.9 и жанром Научная фантастика
+     */
+    @Test
+    void getBooksByAvgRatingWithGenreIdFoundOneTest() {
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(6.9F, 3L);
+        assertThat(bookWithAverageRatingDTOS)
+                .map(Book::getBookName)
+                .allMatch(book -> book.equals("Задача трех тел"));
     }
 
     /**

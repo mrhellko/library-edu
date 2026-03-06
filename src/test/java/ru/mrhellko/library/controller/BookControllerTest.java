@@ -418,4 +418,86 @@ class BookControllerTest {
                 .andExpect(jsonPath("$[0].genres[0].id").value(1))
                 .andExpect(jsonPath("$[0].genres[0].genreName").value("g"));
     }
+
+    /**
+     * Если по AvgRating книги не найдены, то эндпоинт GET /books/avg-rating/{avgRating} возвращает 204 No Content.
+     */
+    @Test
+    void getBooksByAvgRatingNoGenreIdNoContentTest() throws Exception {
+        when(bookAssembler.getBooksByAvgRating(10.0F, null)).thenReturn(List.of());
+
+        mockMvc.perform(get("/books/avg-rating/10.0"))
+                .andExpect(status().isNoContent());
+    }
+
+    /**
+     * Если по AvgRating книги найдены, то эндпоинт GET /books/avg-rating/{avgRating} возвращает 200 OK и JSON со списком.
+     */
+    @Test
+    void getBooksByAvgRatingNoGenreOkTest() throws Exception {
+        Book book = new Book();
+        book.setId(1L);
+        book.setBookName("b");
+        Author author = new Author(1L, "a");
+        book.setAuthors(List.of(author));
+        Genre genre = new Genre(1L, "g");
+        book.setGenres(List.of(genre));
+
+        BookWithAverageRatingDTO dto = new BookWithAverageRatingDTO(book);
+        dto.setAverageRating(1.1F);
+
+        when(bookAssembler.getBooksByAvgRating(1.0F, null)).thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/books/avg-rating/1.0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].bookName").value("b"))
+                .andExpect(jsonPath("$[0].authors[0].id").value(1))
+                .andExpect(jsonPath("$[0].authors[0].authorName").value("a"))
+                .andExpect(jsonPath("$[0].genres[0].id").value(1))
+                .andExpect(jsonPath("$[0].genres[0].genreName").value("g"))
+                .andExpect(jsonPath("$[0].averageRating").value(1.1));
+    }
+
+    /**
+     * Если по AvgRating и genreId книги не найдены, то эндпоинт GET /books/avg-rating/{avgRating}?genreId=...
+     * возвращает 204 No Content.
+     */
+    @Test
+    void getBooksByAvgRatingWithGenreIdNoContentTest() throws Exception {
+        when(bookAssembler.getBooksByAvgRating(1.0F, 1L)).thenReturn(List.of());
+
+        mockMvc.perform(get("/books/avg-rating/1.0?genreId=1"))
+                .andExpect(status().isNoContent());
+    }
+
+    /**
+     * Если по AvgRating и genreId книги найдены, то эндпоинт GET /books/avg-rating/{avgRating}?genreId=...
+     * возвращает 200 OK и JSON со списком.
+     */
+    @Test
+    void getBooksByAvgRatingWithGenreOkTest() throws Exception {
+        Book book = new Book();
+        book.setId(1L);
+        book.setBookName("b");
+        Author author = new Author(1L, "a");
+        book.setAuthors(List.of(author));
+        Genre genre = new Genre(1L, "g");
+        book.setGenres(List.of(genre));
+
+        BookWithAverageRatingDTO dto = new BookWithAverageRatingDTO(book);
+        dto.setAverageRating(1.1F);
+
+        when(bookAssembler.getBooksByAvgRating(1.0F, 1L)).thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/books/avg-rating/1.0?genreId=1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].bookName").value("b"))
+                .andExpect(jsonPath("$[0].authors[0].id").value(1))
+                .andExpect(jsonPath("$[0].authors[0].authorName").value("a"))
+                .andExpect(jsonPath("$[0].genres[0].id").value(1))
+                .andExpect(jsonPath("$[0].genres[0].genreName").value("g"))
+                .andExpect(jsonPath("$[0].averageRating").value(1.1));
+    }
 }
