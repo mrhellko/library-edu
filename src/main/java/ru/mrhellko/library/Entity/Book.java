@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class Book {
+public class Book implements IBook{
 
     private Long id;
 

@@ -122,7 +122,7 @@ public class BookDAOTest extends AbstractDAOTest {
      */
     @Test
     void getBooksByAvgRatingNoGenreIdNotFoundTest() {
-        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(11.0F);
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(11.0F, null);
         assertThat(bookWithAverageRatingDTOS).isEmpty();
     }
 
@@ -131,9 +131,9 @@ public class BookDAOTest extends AbstractDAOTest {
      */
     @Test
     void getBooksByAvgRatingNoGenreIdFoundManyTest() {
-        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(6.9F);
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(6.9F, null);
         assertThat(bookWithAverageRatingDTOS)
-                .map(Book::getBookName)
+                .map(BookWithAverageRatingDTO::getBookName)
                 .contains("Задача трех тел")
                 .contains("Благие знамения");
     }
@@ -143,9 +143,9 @@ public class BookDAOTest extends AbstractDAOTest {
      */
     @Test
     void getBooksByAvgRatingNoGenreIdFoundOneTest() {
-        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(9.9F);
+        List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(9.9F, null);
         assertThat(bookWithAverageRatingDTOS)
-                .map(Book::getBookName)
+                .map(BookWithAverageRatingDTO::getBookName)
                 .allMatch(book -> book.equals("Благие знамения"));
     }
 
@@ -165,7 +165,7 @@ public class BookDAOTest extends AbstractDAOTest {
     void getBooksByAvgRatingWithGenreIdFoundManyTest() {
         List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(2.1F, 6L);
         assertThat(bookWithAverageRatingDTOS)
-                .map(Book::getBookName)
+                .map(BookWithAverageRatingDTO::getBookName)
                 .contains("Гарри Поттер")
                 .contains("Благие знамения");
     }
@@ -177,7 +177,7 @@ public class BookDAOTest extends AbstractDAOTest {
     void getBooksByAvgRatingWithGenreIdFoundOneTest() {
         List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(6.9F, 3L);
         assertThat(bookWithAverageRatingDTOS)
-                .map(Book::getBookName)
+                .map(BookWithAverageRatingDTO::getBookName)
                 .allMatch(book -> book.equals("Задача трех тел"));
     }
 

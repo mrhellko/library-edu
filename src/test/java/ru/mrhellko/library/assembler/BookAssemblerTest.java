@@ -430,13 +430,13 @@ class BookAssemblerTest {
         b.setGenres(List.of(new Genre(1L, "g")));
         b.setAverageRating(5.5F);
 
-        when(bookDAO.getBooksByAvgRating(4.0F)).thenReturn(List.of(b));
+        when(bookDAO.getBooksByAvgRating(4.0F, null)).thenReturn(List.of(b));
 
         List<BookWithAverageRatingDTO> dtos = bookAssembler.getBooksByAvgRating(4.0F, null);
         assertThat(dtos).hasSize(1);
         assertThat(dtos.getFirst().getId()).isEqualTo(1L);
 
-        verify(bookDAO).getBooksByAvgRating(4.0F);
+        verify(bookDAO).getBooksByAvgRating(4.0F, null);
     }
 
     /**

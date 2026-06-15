@@ -420,18 +420,18 @@ class BookControllerTest {
     }
 
     /**
-     * Если по AvgRating книги не найдены, то эндпоинт GET /books/avg-rating/{avgRating} возвращает 204 No Content.
+     * Если по AvgRating книги не найдены, то эндпоинт GET /books/search?avgRating=... возвращает 204 No Content.
      */
     @Test
     void getBooksByAvgRatingNoGenreIdNoContentTest() throws Exception {
         when(bookAssembler.getBooksByAvgRating(10.0F, null)).thenReturn(List.of());
 
-        mockMvc.perform(get("/books/avg-rating/10.0"))
+        mockMvc.perform(get("/books/search?avgRating=10.0"))
                 .andExpect(status().isNoContent());
     }
 
     /**
-     * Если по AvgRating книги найдены, то эндпоинт GET /books/avg-rating/{avgRating} возвращает 200 OK и JSON со списком.
+     * Если по AvgRating книги найдены, то эндпоинт GET /books/search?avgRating=... возвращает 200 OK и JSON со списком.
      */
     @Test
     void getBooksByAvgRatingNoGenreOkTest() throws Exception {
@@ -448,7 +448,7 @@ class BookControllerTest {
 
         when(bookAssembler.getBooksByAvgRating(1.0F, null)).thenReturn(List.of(dto));
 
-        mockMvc.perform(get("/books/avg-rating/1.0"))
+        mockMvc.perform(get("/books/search?avgRating=1.0"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].bookName").value("b"))
@@ -460,19 +460,19 @@ class BookControllerTest {
     }
 
     /**
-     * Если по AvgRating и genreId книги не найдены, то эндпоинт GET /books/avg-rating/{avgRating}?genreId=...
+     * Если по AvgRating и genreId книги не найдены, то эндпоинт GET /books/search?avgRating=...&genreId=...
      * возвращает 204 No Content.
      */
     @Test
     void getBooksByAvgRatingWithGenreIdNoContentTest() throws Exception {
         when(bookAssembler.getBooksByAvgRating(1.0F, 1L)).thenReturn(List.of());
 
-        mockMvc.perform(get("/books/avg-rating/1.0?genreId=1"))
+        mockMvc.perform(get("/books/search?avgRating=1.0&genreId=1"))
                 .andExpect(status().isNoContent());
     }
 
     /**
-     * Если по AvgRating и genreId книги найдены, то эндпоинт GET /books/avg-rating/{avgRating}?genreId=...
+     * Если по AvgRating и genreId книги найдены, то эндпоинт GET /books/search?avgRating=...&genreId=...
      * возвращает 200 OK и JSON со списком.
      */
     @Test
@@ -490,7 +490,7 @@ class BookControllerTest {
 
         when(bookAssembler.getBooksByAvgRating(1.0F, 1L)).thenReturn(List.of(dto));
 
-        mockMvc.perform(get("/books/avg-rating/1.0?genreId=1"))
+        mockMvc.perform(get("/books/search?avgRating=1.0&genreId=1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].bookName").value("b"))

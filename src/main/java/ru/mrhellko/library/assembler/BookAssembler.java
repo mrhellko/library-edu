@@ -3,10 +3,7 @@ package ru.mrhellko.library.assembler;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.mrhellko.library.Entity.Author;
-import ru.mrhellko.library.Entity.Book;
-import ru.mrhellko.library.Entity.BookReview;
-import ru.mrhellko.library.Entity.Genre;
+import ru.mrhellko.library.Entity.*;
 import ru.mrhellko.library.dao.AuthorDAO;
 import ru.mrhellko.library.dao.BookDAO;
 import ru.mrhellko.library.dao.BookReviewDAO;
@@ -142,11 +139,7 @@ public class BookAssembler {
 
     public List<BookWithAverageRatingDTO> getBooksByAvgRating(Float avgRating, Long genreId) {
         List<BookWithAverageRatingDTO> bookWithAverageRatingDTOS;
-        if (genreId == null) {
-            bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(avgRating);
-        } else {
-            bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(avgRating, genreId);
-        }
+        bookWithAverageRatingDTOS = bookDAO.getBooksByAvgRating(avgRating, genreId);
         fillBooksWithAuthors(bookWithAverageRatingDTOS);
         fillBooksWithGenres(bookWithAverageRatingDTOS);
         return bookWithAverageRatingDTOS;
@@ -171,28 +164,28 @@ public class BookAssembler {
         return bookReviews.isEmpty() ? null : (float) sum / bookReviews.size();
     }
 
-    private void fillBooksWithAuthors(List<? extends Book> books) {
-        Map<Long, Book> bookIndex = new HashMap<>();
-        for (Book book : books) {
+    private void fillBooksWithAuthors(List<? extends IBook> books) {
+        Map<Long, IBook> bookIndex = new HashMap<>();
+        for (IBook book : books) {
             bookIndex.put(book.getId(), book);
         }
         List<BookAuthorDTO> bookAuthorDTOS = authorDAO.getAuthorsForBooks(bookIndex.keySet());
         for (BookAuthorDTO bookAuthorDTO : bookAuthorDTOS) {
             Long bookId = bookAuthorDTO.getBookId();
-            Book book = bookIndex.get(bookId);
+            IBook book = bookIndex.get(bookId);
             book.getAuthors().add(new Author(bookAuthorDTO.getAuthorId(), bookAuthorDTO.getAuthorName()));
         }
     }
 
-    private void fillBooksWithGenres(List<? extends Book> books) {
-        Map<Long, Book> bookIndex = new HashMap<>();
-        for (Book book : books) {
+    private void fillBooksWithGenres(List<? extends IBook> books) {
+        Map<Long, IBook> bookIndex = new HashMap<>();
+        for (IBook book : books) {
             bookIndex.put(book.getId(), book);
         }
         List<BookGenreDTO> bookGenreDTOS = genreDAO.getGenresForBooks(bookIndex.keySet());
         for (BookGenreDTO bookGenreDTO : bookGenreDTOS) {
             Long bookId = bookGenreDTO.getBookId();
-            Book book = bookIndex.get(bookId);
+            IBook book = bookIndex.get(bookId);
             book.getGenres().add(new Genre(bookGenreDTO.getGenreId(), bookGenreDTO.getGenreName()));
         }
     }

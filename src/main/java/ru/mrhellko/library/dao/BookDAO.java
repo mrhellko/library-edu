@@ -42,9 +42,8 @@ public class BookDAO {
                 books.book_name,
                 AVG(rating) as avg_rating
             FROM books
-                     JOIN book_genres bg ON books.id = bg.book_id
-                     JOIN genres g ON bg.genre_id = g.id
-                     LEFT JOIN book_reviews br ON books.id = br.book_id
+                     %s
+                     JOIN book_reviews br ON books.id = br.book_id
             %s
             GROUP BY books.id, books.book_name
             HAVING AVG(rating) > ?""";
@@ -123,11 +122,18 @@ public class BookDAO {
         return jdbcTemplate.query(GET_BOOKS_BY_GENRE_ID_SQL, bookRowMapper, genreId);
     }
 
-    public List<BookWithAverageRatingDTO> getBooksByAvgRating(Float avgRating) {
-        return jdbcTemplate.query(String.format(GET_BOOKS_BY_AVG_RATING_SQL, ""), bookWithAverageRatingDTORowMapper, avgRating);
-    }
-
     public List<BookWithAverageRatingDTO> getBooksByAvgRating(Float avgRating, Long genreId) {
-        return jdbcTemplate.query(String.format(GET_BOOKS_BY_AVG_RATING_SQL, "WHERE g.id = " + genreId), bookWithAverageRatingDTORowMapper, avgRating);
+        String sql;
+        Object[] params;
+
+        if (genreId != null) {
+            sql = String.format(GET_BOOKS_BY_AVG_RATING_SQL, "JOIN book_genres bg ON books.id = bg.book_id", "WHERE bg.genre_id = ?");
+            params = new Object[]{genreId, avgRating};
+        } else {
+            sql = String.format(GET_BOOKS_BY_AVG_RATING_SQL, "", "");
+            params = new Object[]{avgRating};
+        }
+
+        return jdbcTemplate.query(sql, bookWithAverageRatingDTORowMapper, params);
     }
 }
