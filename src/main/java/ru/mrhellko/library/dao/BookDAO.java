@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import ru.mrhellko.library.Entity.Book;
+import ru.mrhellko.library.dto.BookWithAverageRatingDTO;
 
 import java.util.List;
 
@@ -35,6 +36,17 @@ public class BookDAO {
             select b.id, b.book_name from books b
                 left join book_genres bg on b.id = bg.book_id
                                     where bg.genre_id = ?""";
+    private static final String GET_BOOKS_BY_AVG_RATING_SQL = """
+            SELECT
+                books.id,
+                books.book_name,
+                AVG(rating) as avg_rating
+            FROM books
+                     %s
+                     JOIN book_reviews br ON books.id = br.book_id
+            %s
+            GROUP BY books.id, books.book_name
+            HAVING AVG(rating) > ?""";
     @Autowired
     private JdbcTemplate jdbcTemplate;
     private final RowMapper<Book> bookRowMapper = (resultSet, _) -> {
@@ -44,6 +56,13 @@ public class BookDAO {
         return book;
     };
     private final RowMapper<Long> idRowMapper = (resultSet, _) -> (Long) resultSet.getLong("id");
+    private final RowMapper<BookWithAverageRatingDTO> bookWithAverageRatingDTORowMapper = (resultSet, _) -> {
+        final BookWithAverageRatingDTO bookWithAverageRatingDTO = new BookWithAverageRatingDTO();
+        bookWithAverageRatingDTO.setId(resultSet.getLong("id"));
+        bookWithAverageRatingDTO.setBookName(resultSet.getString("book_name"));
+        bookWithAverageRatingDTO.setAverageRating(resultSet.getFloat("avg_rating"));
+        return bookWithAverageRatingDTO;
+    };
 
     public Book getBookById(long id) {
         try {
@@ -101,5 +120,20 @@ public class BookDAO {
 
     public List<Book> getBooksByGenreId(Long genreId) {
         return jdbcTemplate.query(GET_BOOKS_BY_GENRE_ID_SQL, bookRowMapper, genreId);
+    }
+
+    public List<BookWithAverageRatingDTO> getBooksByAvgRating(Float avgRating, Long genreId) {
+        String sql;
+        Object[] params;
+
+        if (genreId != null) {
+            sql = String.format(GET_BOOKS_BY_AVG_RATING_SQL, "JOIN book_genres bg ON books.id = bg.book_id", "WHERE bg.genre_id = ?");
+            params = new Object[]{genreId, avgRating};
+        } else {
+            sql = String.format(GET_BOOKS_BY_AVG_RATING_SQL, "", "");
+            params = new Object[]{avgRating};
+        }
+
+        return jdbcTemplate.query(sql, bookWithAverageRatingDTORowMapper, params);
     }
 }
