@@ -1,19 +1,28 @@
 package ru.mrhellko.library.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.mrhellko.library.Entity.*;
 import ru.mrhellko.library.Enum.Quality;
 import ru.mrhellko.library.Enum.StatusCopy;
 import ru.mrhellko.library.assembler.CopyAssembler;
+import ru.mrhellko.library.dto.CopyStorageLocationIDDTO;
+import ru.mrhellko.library.dto.ErrorLoadedCopyDTO;
+import ru.mrhellko.library.dto.ResultLoadedCopyDTO;
+import ru.mrhellko.library.dto.SuccessLoadedCopyDTO;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,6 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CopyControllerTest {
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private CopyAssembler copyAssembler;
@@ -37,7 +49,7 @@ public class CopyControllerTest {
     }
 
     /**
-     * Если список книг не пуст, нет других ошибок, то эндпоинт /books/{bookId}/copy возвращает 200 OK и JSON со списком.
+     * Если список копий не пуст, нет других ошибок, то эндпоинт /books/{bookId}/copy возвращает 200 OK и JSON со списком.
      */
     @Test
     void getCopiesByBookIdOkTest() throws Exception {
@@ -65,5 +77,89 @@ public class CopyControllerTest {
                 .andExpect(jsonPath("$[0].storageLocation.building").value("b"))
                 .andExpect(jsonPath("$[0].storageLocation.room").value("r"))
                 .andExpect(jsonPath("$[0].storageLocation.shelf").value(1));
+    }
+
+    /**
+     * Если при сохранении копий возникает HttpMessageNotReadableException ошибка, то эндпоинт POST /books/{bookId}/copy
+     * возвращает 400 Bad Request.
+     */
+    @Test
+    void saveCopiesBadRequestErrorTest() throws Exception {
+        when(copyAssembler.saveCopies(any(List.class), any(Long.class))).thenThrow(
+                new HttpMessageNotReadableException("bad input"));
+
+        CopyStorageLocationIDDTO request = new CopyStorageLocationIDDTO();
+        request.setId("c");
+        request.setBookId(1L);
+        request.setQuality(Quality.EXCELLENT);
+        request.setStatus(StatusCopy.ISSUED);
+        request.setStorageLocationId(1L);
+
+        mockMvc.perform(post("/books/1/copy")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    /**
+     * Если при сохранении копий возникает иная ошибка, то эндпоинт POST /books/{bookId}/copy
+     * возвращает 500 Internal Server Error.
+     */
+    @Test
+    void saveCopiesInternalServerErrorTest() throws Exception {
+        when(copyAssembler.saveCopies(any(List.class), any(Long.class))).thenThrow(new RuntimeException("boom"));
+
+        CopyStorageLocationIDDTO c = new CopyStorageLocationIDDTO();
+        c.setId("c");
+        c.setBookId(1L);
+        c.setQuality(Quality.EXCELLENT);
+        c.setStatus(StatusCopy.ISSUED);
+        c.setStorageLocationId(1L);
+
+        List<CopyStorageLocationIDDTO> request = List.of(c);
+
+        mockMvc.perform(post("/books/1/copy")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    /**
+     * Если копия сохранена успешно, то эндпоинт POST /books/{bookId}/copy возвращает 200 OK и JSON с результатами
+     * сохранений.
+     */
+    @Test
+    void saveCopiesOkTest() throws Exception {
+        ResultLoadedCopyDTO result = new ResultLoadedCopyDTO();
+        SuccessLoadedCopyDTO successLoadedCopyDTO = new SuccessLoadedCopyDTO("a");
+        ErrorLoadedCopyDTO errorLoadedCopyDTO = new ErrorLoadedCopyDTO("b", "e");
+        result.setSuccessLoadedCopyDTOS(List.of(successLoadedCopyDTO));
+        result.setErrorLoadedCopyDTOS(List.of(errorLoadedCopyDTO));
+
+        when(copyAssembler.saveCopies(any(List.class), any(Long.class))).thenReturn(result);
+
+        CopyStorageLocationIDDTO c = new CopyStorageLocationIDDTO();
+        c.setId("a");
+        c.setBookId(1L);
+        c.setQuality(Quality.EXCELLENT);
+        c.setStatus(StatusCopy.ISSUED);
+        c.setStorageLocationId(1L);
+
+        CopyStorageLocationIDDTO e = new CopyStorageLocationIDDTO();
+        e.setId("a");
+        e.setBookId(1L);
+        e.setQuality(Quality.EXCELLENT);
+        e.setStatus(StatusCopy.ISSUED);
+        e.setStorageLocationId(1L);
+
+        List<CopyStorageLocationIDDTO> request = List.of(c, e);
+
+        mockMvc.perform(post("/books/1/copy")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.successLoadedCopyDTOS[0].id").value("a"))
+                .andExpect(jsonPath("$.errorLoadedCopyDTOS[0].id").value("b"))
+                .andExpect(jsonPath("$.errorLoadedCopyDTOS[0].errorMessage").value("e"));
     }
 }

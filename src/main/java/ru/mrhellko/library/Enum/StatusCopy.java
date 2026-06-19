@@ -1,5 +1,8 @@
 package ru.mrhellko.library.Enum;
 
+import lombok.Getter;
+
+@Getter
 public enum StatusCopy {
     ISSUED(0),
     AVAILABLE_FOR_ISSUE(1),
