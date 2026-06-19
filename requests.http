@@ -74,6 +74,12 @@ GET http://localhost:8080/books/by-author/4
 ### Получить книги по id жанра (id указан после /genre/)
 GET http://localhost:8080/books/genre/1
 
+### Получить книги, у которых средний рейтинг строго больше avgRating (avgRating указан после /search?)
+GET http://localhost:8080/books/search?avgRating=4.1
+
+### Получить книги, у которых средний рейтинг строго больше avgRating и жанр равен id (avgRating указан после /search?, genreId указан после &genreId)
+GET http://localhost:8080/books/search?avgRating=4.1&genreId=1
+
 ### Получить отзыв по id книги (id указан после /book/)
 GET http://localhost:8080/reviews/book/1
 
@@ -157,3 +163,72 @@ Content-Type: application/json
 
 ### Удалить жанр по id (id указан после /)
 DELETE http://localhost:8080/genres/8
+
+### Получить место хранения по id (id указан после /)
+GET http://localhost:8080/storage-locations/2
+
+### Обновить место хранения по id (id указан после /)
+PUT http://localhost:8080/storage-locations/2
+Content-Type: application/json
+
+{
+  "id": 2,
+  "authorName": "Terry Pratchett"
+}
+
+### Создать новое место хранения
+POST http://localhost:8080/storage-locations/
+Content-Type: application/json
+
+{
+  "id": 5342,
+  "authorName": "Leo Tolstoy"
+}
+
+### Удалить место хранения по id (id указан после /)
+DELETE http://localhost:8080/storage-locations/1
+
+### Получить отсортированный по quality список копий по bookId (bookId указан между /books/ и /copy)
+GET http://localhost:8080/books/1502/copy
+
+### Создать несколько копий книги по bookId (bookId указан между /books/ и /copy)
+POST http://localhost:8080/books/1/copy
+Content-Type: application/json
+
+[
+  {
+    "id": "kfw",
+    "bookId": 2,
+    "quality": 2,
+    "status": 1,
+    "storageLocationId": 5
+  },
+  {
+    "id": "f3",
+    "bookId": 1,
+    "quality": 1,
+    "status": 1,
+    "storageLocationId": 1
+  },
+  {
+    "id": "L0q",
+    "bookId": 2,
+    "quality": 3,
+    "status": 2,
+    "storageLocationId": 1
+  },
+  {
+    "id": "L0q",
+    "bookId": 1,
+    "quality": 1,
+    "status": 1,
+    "storageLocationId": 1
+  },
+  {
+    "id": "L0q",
+    "bookId": 1,
+    "quality": 2,
+    "status": 1,
+    "storageLocationId": 1
+  }
+]
